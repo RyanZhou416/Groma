@@ -25,7 +25,7 @@
 | 5 未经审计不得宣称；形式化验证按覆盖表述 | **保留** | 行业是姿态（BoringSSL"not intended for general use"、ring"experiment"）而非条款；Groma 章程化是合理强化 | 附录 BoringSSL/aws-lc 的 FIPS.md 措辞模板；"形式化验证按真实覆盖表述"保留为自律条款并标注"无标准原文" |
 | 6 FIPS 非目标、不得暗示合规 | **保留＋工具化** | 行业模板：BoringSSL"整体非 FIPS validated"（仅 BCM 获证）、aws-lc 精确措辞；oxicrypt"holds no NIST certificate"是正面样板 | 附行业措辞模板；加 CI 禁词扫描（"FIPS validated/认证/compliant"出现在对外文案即红） |
 | 7 公开向量＋负向用例＋fuzz；演示非安全门 | **保留＋强化（本条最重要）** | 成分均有依据（CAVP/Wycheproof/SSDF/ISO 19790 PCT）；两个失败模式：向量粒度不足（SHAKE 分块、x25519 双向）与缺协议负向（rustls 被审计仍漏两年）；**致命细节：向量必须来自独立来源**（CAVP 刻意由 NIST 生成向量打破自证循环） | 强化为：①向量来源须独立于实现（NIST 文件/Wycheproof/第三方实现交叉）②负向用例须含协议/状态机负向与规范超限拒绝③每个公开密码学 API ≥1 正＋≥1 负（覆盖门禁）④fuzz 自建 cargo-fuzz CI（OSS-Fuzz 对 RustCrypto 覆盖空白，不能指望外部） |
-| 8 交付路径无 C/C++ 构建 | **保留＋重新定位** | 无任何标准依据（SLSA/SSDF 不管语言）；行业路线选择（共识度低）；但机器可执行度最高（links 字段＋cc/cmake build-dep 检测＋deny bans）；事故视角：严格执行反而规避 aws-lc-rs CCM 类公告 | 如实标注性质："语言安全策略自选，非行业共识"，但它是**用户的核心诉求**（编译不方便），保留为硬性；边界精确化：约束**合同层与默认交付路径**（groma-core/codec/rustcrypto 后端）；FIPS 需求经"可选后端适配器"满足并显式标注 C 构建要求（与 D1=(a)、D4=(e) 一致） |
+| 8 交付路径无 C/C++ 构建 | ✅ **已决（2026-09-16）：方案 (a)**——官方发布的所有 crate（核心/补缺/适配器）依赖闭包零 C；不发 ring/aws-lc-rs 适配器（"五个示范后端"缩为 RustCrypto/libcrux/graviola＋stub）；FIPS 消费者经开放合同自写适配器（graviola 的第三方桥模式已证明可行）；全仓一条 CI 门禁可机器验证"官方零 C" | 无标准依据、行业共识度低，但为用户核心动机，保留为硬性且边界收紧为"官方全交付" |
 | 9 范围变更先改章程 | **保留** | 行业通用做法是"先讨论/提案后实现"（Go proposal、rustls"先开 issue"、BoringSSL API-CONVENTIONS）；Groma 的"先改 SCOPE"是机制化表达 | 保留原样 |
 
 ---
@@ -62,7 +62,7 @@
 ## 5 待拍板清单
 
 - [x] #2 降级：**已决**——四条款版（参考加速为常态＋重写实现＋留痕/许可护栏＋独立验证）
-- [ ] #8 边界："交付路径"→"合同层与默认交付路径"（可选 FIPS 后端显式标注 C）
+- [x] #8 边界：**已决**——方案 (a) 官方全交付零 C，不发 ring/aws-lc-rs 适配器
 - [ ] #7 强化四项（独立来源/协议与边界负向/API 覆盖门禁/自建 fuzz）
 - [ ] 新增 N1–N6 是否全收（N5 可并入 #7）
 - [ ] 其余（#1/#3 合并入 N2、#4/#5/#6 精确化、#9 保留）按建议直接改
