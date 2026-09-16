@@ -144,7 +144,7 @@
 | A1 | `LICENSE-APACHE` 目前**不是 Apache-2.0 全文**（为免大段法律文本重复，写了规范头＋指向 ASF 官方文本＋双许可理由） | 导致 GitHub 识别 licence 为 `Other` 而非 `Apache-2.0` | ✅ **已决**：保持 MIT OR Apache-2.0；`LICENSE-APACHE` 已替换为逐字全文，版权署名维持 "2026 Groma contributors" |
 | A2 | `groma-*` 命名**未在 crates.io 占名** | 仓库已公开，存在被抢注风险 | ✅ **已决**：首次发布前再做（发布真实 crate 时自然占名，不发 pointer crate） |
 | A3 | 是否引入 CI | 当前无任何 CI | ✅ **已决**：已加发布级 CI（`.github/workflows/ci.yml`：fmt／clippy／test 矩阵［ubuntu＋windows × 1.98.1＋1.89.0 MSRV］／no_std 交叉检查／cargo-deny 禁 C 依赖＋cargo-audit／rustdoc／最小版本／覆盖率／tag 触发 semver-checks＋publish dry-run）＋dependabot |
-| A4 | 第二个后端选谁 | `SCOPE.md` §D6 列为待决 | P1 用最小 in-tree stub 最省；`graviola`／`libcrux` 留到 P3 |
+| A4 | 第二个后端选谁 | `SCOPE.md` §D6 列为待决 | ✅ **已决（2026-09-16）**：P1 用最小 in-tree stub（`groma-stub`，自写 SHA-256，差分专用）；graviola/libcrux 留到 P3/P4 |
 | A5 | `no_std` 口径（D1）／trait 动态性（D2）／算法枚举扩展方式（D3）／后端选择机制（D4） | 见 [`DESIGN.md`](DESIGN.md) §2 | P1 必须定，晚了改不动；**D1 已决：方案 (a) 合同层 `no_std`+`alloc`、后端不限**；**D2 已决：方案 (d) 单层对象安全合同（工厂化构造）**；**D3 已决：方案 (a) 封闭 `#[non_exhaustive]` 枚举**；**D4 已决：方案 (e) 纯构造注入（合同零选择机制）** |
 | A6 | "做到 OpenSSL 的水平"的目标声明与生态位 | 用户 2026-09-16 提出：功能覆盖度对标＋有现成纯 Rust 实现则引用 | 🔶 部分已决：生态位＝方案 A（集成供给层），表述已按开发者视角调整为**双锚点**（获客=无 C 稀缺件，留存=统一合同），见 [`POSITIONING.md`](POSITIONING.md) §0/§1.1；目标声明（[`GOALS.md`](GOALS.md)）与阶段顺序、开发内容、并入 SCOPE 时机待全貌后定 |
 
