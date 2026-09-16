@@ -53,7 +53,7 @@ that generic libraries cannot express.
 | D4 | Backend selection | (a) compile-time features (b) runtime registration (c) both | ✅ **已决 2026-09-16：方案 (e) 纯构造注入**（研究后选型，替代原 (c)）——合同层零选择机制（无 feature 选择、无全局注册表、无默认后端、无 `install()`）；装载＝普通依赖（伞 crate feature 只作可叠加的 re-export 糖）；选择＝组合根显式传值；注册表＝外围 crate 普通对象。根除 feature 互斥冲突／全局安装／"库替应用做决定"三类生态顽疾 |
 | D5 | Error taxonomy depth | (a) coarse (b) fine-grained per family | ✅ **已决 2026-09-16：方案 (d) 统一分类枚举＋源链**（研究后选型，替代原 (a)/(b)）——单一 `#[non_exhaustive]` 枚举，变体＝类别（`InvalidSignature`／`InvalidEncoding`／`UnsupportedAlgorithm`／`BackendFailure`／`ParameterError`）而非原因；原因走 `source()` 链（signature crate 的 hashed-error 模式）；Display 不含密钥/明文。可匹配防 fail-open、细节不入 match 防错误预言机、枚举不爆炸防 semver 抖动；统一类型也是 D2=(d) 对象安全合同的必然推论 |
 | D6 | Which second backend proves P1 | (a) graviola (b) a minimal in-tree stub (c) libcrux | ✅ **已决 2026-09-16：方案 (b)**——`groma-stub`：照 FIPS 180-4＋CAVP 公开向量自写 SHA-256（差分测试专用、非生产、显式豁免于"不重写算法"约束的精神——不发货不竞争）；graviola 主场 P3/P4（高性能＋rustls 桥）、libcrux 主场 P3（PQC），均不在合同冻结期引入 |
-| D7 | Vector storage | (a) vendored in-tree (b) fetched by hash | Licensing and size trade-off; provenance manifest either way |
+| D7 | Vector storage | (a) vendored in-tree (b) fetched by hash | ⏸ **暂停（2026-09-16）**：用户要求先系统性验证硬约束（尤其约束 7 的"公开向量＋负向用例"），D7 作为约束修订的下游再定 |
 
 ### 2.1 Environment policy (decided 2026-09-16)
 
