@@ -88,8 +88,11 @@ jobs:
         with:
           tool: cargo-deny,cargo-audit
       - name: Ban C build requirements and out-of-policy licences
+        # hashFiles() is only valid in step-level conditionals, never job-level `if`.
+        if: hashFiles('Crates/**/Cargo.toml') != ''
         run: cargo deny check bans licenses sources
       - name: RUSTSEC advisory scan
+        if: hashFiles('Crates/**/Cargo.toml') != ''
         run: cargo audit
       - name: In-tree dependency audit (P1 deliverable; runs once it exists)
         if: hashFiles('Tools/dependency-audit/Cargo.toml') != ''
@@ -120,7 +123,6 @@ jobs:
   coverage:
     name: coverage (llvm-cov)
     runs-on: ubuntu-latest
-    if: hashFiles('Crates/**/Cargo.toml') != ''
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -130,15 +132,19 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-llvm-cov
-      - run: cargo llvm-cov --workspace --lcov --output-path lcov.info
-      - uses: codecov/codecov-action@v5
+      - name: Generate coverage
+        if: hashFiles('Crates/**/Cargo.toml') != ''
+        run: cargo llvm-cov --workspace --lcov --output-path lcov.info
+      - name: Upload coverage
+        if: hashFiles('Crates/**/Cargo.toml') != ''
+        uses: codecov/codecov-action@v5
         with:
           files: lcov.info
 
   semver-checks:
     name: semver-checks (release tags only)
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') && hashFiles('Crates/**/Cargo.toml') != ''
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -158,7 +164,7 @@ jobs:
   publish-dry-run:
     name: publish dry-run (release tags only)
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') && hashFiles('Crates/**/Cargo.toml') != ''
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
