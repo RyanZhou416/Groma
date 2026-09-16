@@ -8,7 +8,7 @@
 
 Groma is not audited. Nothing in this repository has been independently reviewed, and no crate here
 should be used to protect real secrets. The project makes no claim of being production-safe, and no
-claim of FIPS 140-3 compliance — that is an explicit non-goal (see `docs/SCOPE.md` §2.3).
+claim of FIPS 140-3 compliance — that is an explicit non-goal (see `../SCOPE.md` §2.3).
 
 ## Reporting a vulnerability
 
@@ -53,7 +53,7 @@ Out of scope:
 - Vulnerabilities in third-party dependencies. Report those upstream; tell us as well so the
   advisory can be tracked.
 - The absence of FIPS validation, which is a documented non-goal.
-- Missing algorithms listed as deferred in `docs/SCOPE.md` §6.
+- Missing algorithms listed as deferred in `../SCOPE.md` §6.
 - Denial of service through deliberately unbounded use of a documented low-level API by a caller who
   bypassed the bounded entry points.
 

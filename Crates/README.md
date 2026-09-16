@@ -1,6 +1,6 @@
-# crates/
+# Crates/
 
-One directory per crate, added as each phase of [`../docs/SCOPE.md`](../docs/SCOPE.md) lands.
+One directory per crate, added as each phase of [`../Docs/SCOPE.md`](../Docs/SCOPE.md) lands.
 
 Planned units (the whole `groma-*` namespace was verified free on crates.io on 2026-09-16):
 

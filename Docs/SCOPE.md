@@ -195,11 +195,11 @@ These are inherited from the original charter and remain binding.
 Groma/
 ├─ Cargo.toml              workspace root (members added per phase)
 ├─ rust-toolchain.toml     pinned toolchain
-├─ crates/                 one directory per crate, added per phase
-├─ vectors/                pinned public test vectors and provenance manifests
-├─ fuzz/                   fuzz targets and crash regressions
-├─ docs/                   charter, design, research (Chinese narrative)
-└─ tools/                  repository tooling (vector fetch, audit, differential drivers)
+├─ Crates/                 one directory per crate, added per phase
+├─ Vectors/                pinned public test vectors and provenance manifests
+├─ Fuzz/                   fuzz targets and crash regressions
+├─ Docs/                   charter, design, research (Chinese narrative)
+└─ Tools/                  repository tooling (vector fetch, audit, differential drivers)
 ```
 
 Crate naming follows the project prefix: `groma-core`, `groma-codec`, `groma-rustcrypto`,
@@ -429,5 +429,6 @@ much is genuinely new implementation.
 
 | Date | Change |
 |------|--------|
+| 2026-09-16 | Top-level folders renamed to PascalCase (Crates/ Docs/ Fuzz/ Tools/ Vectors/); crate directories stay lowercase because Cargo package names forbid uppercase. See HANDOFF.md. |
 | 2026-09-16 | Renamed the project from VeriCeremony to **Groma** and widened the scope from a WebAuthn-only crypto provider to a general pure-Rust cryptography library. Added the three admission criteria, L1–L7 layering, P1–P6 phasing, the explicit non-goal on FIPS 140-3, the wheel/deep-integration boundary, and the consumer benefit guarantee. Clarified contract requirement 5 (lazy immutable tables and per-backend error queues are permitted). |
 | 2026-09-16 | (as VeriCeremony) Established scope for a standalone WebAuthn crypto-provider project. |

@@ -29,5 +29,5 @@
 *.bin       binary
 
 # Language statistics
-docs/**     linguist-documentation
-vectors/**  linguist-vendored
+Docs/**     linguist-documentation
+Vectors/**  linguist-vendored

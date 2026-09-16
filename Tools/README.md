@@ -1,4 +1,4 @@
-# tools/
+# Tools/
 
 Repository tooling. Nothing here ships to consumers.
 
@@ -6,7 +6,7 @@ Repository tooling. Nothing here ships to consumers.
 
 1. Tools are deterministic and offline by default. Anything that reaches the network says so in its
    name and its `--help`.
-2. A tool that fetches vectors writes a provenance manifest (see [`../vectors/README.md`](../vectors/README.md)).
+2. A tool that fetches vectors writes a provenance manifest (see [`../Vectors/README.md`](../Vectors/README.md)).
 3. A tool that asserts a quality gate exits non-zero on failure. No tool may report success from a
    warning or a screenshot.
 

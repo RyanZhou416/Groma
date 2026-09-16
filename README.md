@@ -39,7 +39,7 @@ ecosystem.
 
 | Not this | Why |
 |----------|-----|
-| An OpenSSL replacement | A different project with different governance; scope grows only by the admission criteria in `docs/SCOPE.md` |
+| An OpenSSL replacement | A different project with different governance; scope grows only by the admission criteria in `../SCOPE.md` |
 | A FIPS 140-3 validated module | No pure-Rust module is validated, and validation cannot be inherited across an implementation-language change |
 | A protocol stack | TLS, QUIC, SSH, IPsec, Kerberos, Signal and WireGuard are implemented elsewhere; Groma supplies their crypto backend through adapters |
 | An HSM or TPM stack | Groma provides the cryptographic core and the adaptation boundary only |
@@ -51,11 +51,11 @@ ecosystem.
 
 ```
 Groma/
-├─ crates/         one crate per unit, added as each phase lands
-├─ vectors/        pinned public test vectors with provenance manifests
-├─ fuzz/           fuzz targets and crash regressions
-├─ docs/           charter, design, research
-└─ tools/          vector fetching, dependency audit, differential drivers
+├─ Crates/         one crate per unit, added as each phase lands
+├─ Vectors/        pinned public test vectors with provenance manifests
+├─ Fuzz/           fuzz targets and crash regressions
+├─ Docs/           charter, design, research
+└─ Tools/          vector fetching, dependency audit, differential drivers
 ```
 
 Crates carry the project prefix: `groma-core`, `groma-codec`, `groma-rustcrypto`, `groma-graviola`,
@@ -111,11 +111,12 @@ P1 is strictly serial. Algorithm families inside P3 and formats inside P5 are in
 
 | Document | Content |
 |----------|---------|
-| [`docs/SCOPE.md`](docs/SCOPE.md) | **Authoritative charter**: admission criteria, layers, phases, non-goals, quality gates, governance |
-| [`docs/DESIGN.md`](docs/DESIGN.md) | Contract design notes and open technical decisions |
-| [`docs/research/`](docs/research/) | Ecosystem surveys and the evidence behind the scope |
+| [`Docs/SCOPE.md`](Docs/SCOPE.md) | **Authoritative charter**: admission criteria, layers, phases, non-goals, quality gates, governance |
+| [`Docs/HANDOFF.md`](Docs/HANDOFF.md) | **Temporary handoff brief**: structured owner requirements, scope rulings, P1 deliverables and exit criteria, hard constraints, known traps |
+| [`Docs/DESIGN.md`](Docs/DESIGN.md) | Contract design notes and open technical decisions |
+| [`Docs/research/`](Docs/research/) | Ecosystem surveys and the evidence behind the scope |
 
-For Chinese-language narrative, `docs/SCOPE.md` is written in Chinese; this README is the English
+For Chinese-language narrative, `../SCOPE.md` is written in Chinese; this README is the English
 entry point.
 
 ---

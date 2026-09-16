@@ -4,7 +4,7 @@ members = []
 
 # Groma — a provider contract and pure-Rust implementations for cryptography.
 #
-# Members are added as each phase of `docs/SCOPE.md` lands. The workspace is
+# Members are added as each phase of `../SCOPE.md` lands. The workspace is
 # intentionally empty until P1 (contract freeze) is implemented, so that the
 # root manifest never advertises crates that do not exist yet.
 
@@ -15,4 +15,4 @@ repository = "https://github.com/RyanZhou416/Groma"
 rust-version = "1.89"
 
 [workspace.dependencies]
-# Intentionally empty until P1. Backend crates pin versions per `docs/DESIGN.md`.
+# Intentionally empty until P1. Backend crates pin versions per `Docs/DESIGN.md`.

@@ -1,16 +1,16 @@
-# fuzz/
+# Fuzz/
 
 Fuzz targets and crash regressions.
 
 ## Rules
 
 1. **Every untrusted parsing entry point has a durable target.** This is required by
-   `docs/SCOPE.md` §3.2 rule 3 and §7.
+   `../SCOPE.md` §3.2 rule 3 and §7.
 2. **Every crash becomes a fixed regression.** A crashing input is minimised, committed under
-   `fuzz/regression/`, and referenced from a test that fails if it crashes again.
+   `Fuzz/regression/`, and referenced from a test that fails if it crashes again.
 3. **Targets must be bounded.** A fuzz target feeds data to the *bounded* entry points, so that a
    finding is a real defect rather than a caller misusing a documented low-level API.
-4. **Artifacts and corpus are not committed.** `fuzz/artifacts/`, `fuzz/corpus/` and `fuzz/target/`
+4. **Artifacts and corpus are not committed.** `Fuzz/artifacts/`, `Fuzz/corpus/` and `Fuzz/target/`
    are git-ignored. Only minimised regression inputs are committed.
 
 ## Planned targets
@@ -27,4 +27,4 @@ Fuzz targets and crash regressions.
 
 Fuzzing finds crashes, over-reads, unbounded allocation, and non-termination. It does **not**
 establish that accepted inputs are *semantically* correct — that is what the vector corpora in
-[`../vectors/`](../vectors/) are for. Neither replaces independent audit.
+[`../Vectors/`](../Vectors/) are for. Neither replaces independent audit.

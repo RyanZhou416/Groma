@@ -21,10 +21,10 @@ Thumbs.db
 # Local scratch / evidence
 /tmp/
 /scratch/
-/vectors/local/
+/Vectors/local/
 *.log
 
 # Fuzzing artifacts
-/fuzz/artifacts/
-/fuzz/corpus/
-/fuzz/target/
+/Fuzz/artifacts/
+/Fuzz/corpus/
+/Fuzz/target/

@@ -7,7 +7,7 @@
 
 ## 1 Before you write code
 
-1. Read [`docs/SCOPE.md`](docs/SCOPE.md). If your change is not permitted by the layers and admission
+1. Read [`Docs/SCOPE.md`](Docs/SCOPE.md). If your change is not permitted by the layers and admission
    criteria there, the correct first step is a scope discussion — not a pull request.
 2. Read the relevant public specification. Behaviour is defined by RFC / NIST / W3C / ISO documents,
    not by another language's implementation.
@@ -42,7 +42,7 @@ not security gates.
 
 ## 4 Documentation language
 
-- Narrative documents under `docs/` are written in **Chinese**.
+- Narrative documents under `Docs/` are written in **Chinese**.
 - `README.md` is the English entry point and may also be bilingual.
 - Code, identifiers, paths, commands, and file/folder names are **English**.
 - Commit messages: English, imperative mood.
