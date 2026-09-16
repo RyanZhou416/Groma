@@ -1,4 +1,8 @@
 [toolchain]
-channel = "1.89.0"
+# Development toolchain only. The minimum supported Rust version (MSRV) that
+# Groma promises to consumers is declared separately in `Cargo.toml`
+# (`rust-version = "1.89"`) and enforced by the CI matrix; see
+# `Docs/DESIGN.md` §2.1. Bump this pin deliberately, never casually.
+channel = "1.98.1"
 components = ["rustfmt", "clippy"]
 profile = "minimal"

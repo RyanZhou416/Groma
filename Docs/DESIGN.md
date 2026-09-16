@@ -55,6 +55,23 @@ that generic libraries cannot express.
 | D6 | Which second backend proves P1 | (a) graviola (b) a minimal in-tree stub (c) libcrux | (b) is cheapest and keeps P1 honest; (a)/(c) depend on availability |
 | D7 | Vector storage | (a) vendored in-tree (b) fetched by hash | Licensing and size trade-off; provenance manifest either way |
 
+### 2.1 Environment policy (decided 2026-09-16)
+
+Frozen with the owner while the repository was formalised:
+
+- **MSRV = 1.89** (`rust-version` in the workspace manifest). The floor is set by the ecosystem,
+  not by taste: edition 2024 requires 1.85, RustCrypto's current generation (digest/sha2 0.11)
+  requires 1.85, and graviola 0.3+ requires 1.89. Anything lower would mean pinning outdated
+  dependency versions, which a security library must not do.
+- **Development toolchain pinned to 1.98.1** (`rust-toolchain.toml`). Contributors and CI build
+  with one exact compiler; the pin is bumped deliberately every few months, never floating.
+- **CI keeps the promise.** The matrix builds and tests on 1.89 (MSRV) and 1.98.1 (stable), on
+  Ubuntu and Windows. Day-to-day code may use newer language features only if the MSRV leg still
+  passes; `resolver = "3"` plus `rust-version` keeps transitive dependencies inside the same floor
+  (MSRV-aware resolution).
+- **MSRV changes** happen only when (a) an upgraded dependency requires it, or (b) an essential
+  language feature requires it; only in a minor release; always with a changelog entry.
+
 ---
 
 ## 3 Backend notes
@@ -114,3 +131,4 @@ differential harness is the arbiter.
 | Date | Change |
 |------|--------|
 | 2026-09-16 | Initial design notes: contract shape, open decisions D1–D7, backend characteristics, security engineering rules. |
+| 2026-09-16 | Added §2.1 environment policy (decided): MSRV 1.89, dev toolchain 1.98.1, CI matrix, MSRV change rules. |

@@ -141,9 +141,9 @@
 
 | # | 事项 | 说明 | 建议 |
 |---|------|------|------|
-| A1 | `LICENSE-APACHE` 目前**不是 Apache-2.0 全文**（为免大段法律文本重复，写了规范头＋指向 ASF 官方文本＋双许可理由） | 导致 GitHub 识别 licence 为 `Other` 而非 `Apache-2.0` | 首次发布前替换为逐字全文（文件内已写明该承诺） |
-| A2 | `groma-*` 命名**未在 crates.io 占名** | 仓库已公开，存在被抢注风险 | 决定是否发 pointer crate 占名（可仿 `oxicrypt` 只放 README 指向仓库） |
-| A3 | 是否引入 CI | 当前无任何 CI | P1 建议加：`fmt`／`clippy`／`test`／`dependency-audit` |
+| A1 | `LICENSE-APACHE` 目前**不是 Apache-2.0 全文**（为免大段法律文本重复，写了规范头＋指向 ASF 官方文本＋双许可理由） | 导致 GitHub 识别 licence 为 `Other` 而非 `Apache-2.0` | ✅ **已决**：保持 MIT OR Apache-2.0；`LICENSE-APACHE` 已替换为逐字全文，版权署名维持 "2026 Groma contributors" |
+| A2 | `groma-*` 命名**未在 crates.io 占名** | 仓库已公开，存在被抢注风险 | ✅ **已决**：首次发布前再做（发布真实 crate 时自然占名，不发 pointer crate） |
+| A3 | 是否引入 CI | 当前无任何 CI | ✅ **已决**：已加发布级 CI（`.github/workflows/ci.yml`：fmt／clippy／test 矩阵［ubuntu＋windows × 1.98.1＋1.89.0 MSRV］／no_std 交叉检查／cargo-deny 禁 C 依赖＋cargo-audit／rustdoc／最小版本／覆盖率／tag 触发 semver-checks＋publish dry-run）＋dependabot |
 | A4 | 第二个后端选谁 | `SCOPE.md` §D6 列为待决 | P1 用最小 in-tree stub 最省；`graviola`／`libcrux` 留到 P3 |
 | A5 | `no_std` 口径（D1）／trait 动态性（D2）／算法枚举扩展方式（D3）／后端选择机制（D4） | 见 [`DESIGN.md`](DESIGN.md) §2 | P1 必须定，晚了改不动 |
 
@@ -200,3 +200,4 @@
 | 日期 | 变更 |
 |------|------|
 | 2026-09-16 | 创建临时接手需求书：结构化用户权威需求 R1–R6、范围裁决、命名与目录约定、P1 交付与出口判据、硬约束、待拍板事项、已知坑、玩家服务边界、接手确认清单。 |
+| 2026-09-16 | 项目正式化：A1 已决（双许可保持，LICENSE-APACHE 换逐字全文）、A2 已决（首发前占名）、A3 已决（发布级 CI 落地）；工具链政策定案（MSRV 1.89，开发工具链 1.98.1，CI 双版本矩阵），写入 `DESIGN.md` §2.1。 |

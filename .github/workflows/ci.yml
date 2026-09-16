@@ -1,0 +1,173 @@
+name: CI
+
+# Release-grade quality gates (HANDOFF.md A3, resolved 2026-09-16):
+#   - fmt / clippy on the pinned development toolchain
+#   - test matrix: Ubuntu + Windows x {dev toolchain 1.98.1, MSRV 1.89}
+#   - no_std cross-check (thumbv7em-none-eabihf)
+#   - dependency audit: cargo-deny (C-build ban + licence policy) + cargo-audit
+#     (RUSTSEC advisories) + the in-tree `Tools/dependency-audit` once P1 lands it
+#   - rustdoc with warnings denied
+#   - minimal dependency versions (nightly)
+#   - coverage (llvm-cov -> codecov), enabled once the first crate exists
+#   - release gates on tags: semver-checks and publish --dry-run
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  DEV_TOOLCHAIN: "1.98.1"
+
+jobs:
+  fmt:
+    name: fmt (stable)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.DEV_TOOLCHAIN }}
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    name: clippy (stable)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.DEV_TOOLCHAIN }}
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+  test:
+    name: test (${{ matrix.os }}, ${{ matrix.toolchain }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        toolchain: ["1.98.1", "1.89.0"] # 1.89.0 leg enforces the declared MSRV
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ matrix.toolchain }}
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace --all-targets
+
+  no-std:
+    name: no_std build (thumbv7em-none-eabihf)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.DEV_TOOLCHAIN }}
+          targets: thumbv7em-none-eabihf
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo check --workspace --target thumbv7em-none-eabihf
+
+  audit:
+    name: dependency audit (deny + advisories)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.DEV_TOOLCHAIN }}
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny,cargo-audit
+      - name: Ban C build requirements and out-of-policy licences
+        run: cargo deny check bans licenses sources
+      - name: RUSTSEC advisory scan
+        run: cargo audit
+      - name: In-tree dependency audit (P1 deliverable; runs once it exists)
+        if: hashFiles('Tools/dependency-audit/Cargo.toml') != ''
+        run: cargo run --manifest-path Tools/dependency-audit/Cargo.toml --locked
+
+  doc:
+    name: rustdoc (stable)
+    runs-on: ubuntu-latest
+    env:
+      RUSTDOCFLAGS: "-D warnings"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.DEV_TOOLCHAIN }}
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo doc --workspace --no-deps
+
+  minimal-versions:
+    name: minimal dependency versions (nightly)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - run: cargo update -Z minimal-versions
+      - run: cargo check --workspace --all-targets
+
+  coverage:
+    name: coverage (llvm-cov)
+    runs-on: ubuntu-latest
+    if: hashFiles('Crates/**/Cargo.toml') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.DEV_TOOLCHAIN }}
+          components: llvm-tools-preview
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+      - run: cargo llvm-cov --workspace --lcov --output-path lcov.info
+      - uses: codecov/codecov-action@v5
+        with:
+          files: lcov.info
+
+  semver-checks:
+    name: semver-checks (release tags only)
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') && hashFiles('Crates/**/Cargo.toml') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.DEV_TOOLCHAIN }}
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-semver-checks
+      - name: Check every crate against its published baseline
+        run: |
+          for d in Crates/*; do
+            if [ -f "$d/Cargo.toml" ]; then
+              (cd "$d" && cargo semver-checks check-release)
+            fi
+          done
+
+  publish-dry-run:
+    name: publish dry-run (release tags only)
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') && hashFiles('Crates/**/Cargo.toml') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.DEV_TOOLCHAIN }}
+      - name: Verify every crate is publishable
+        run: |
+          for d in Crates/*; do
+            if [ -f "$d/Cargo.toml" ]; then
+              (cd "$d" && cargo publish --dry-run)
+            fi
+          done

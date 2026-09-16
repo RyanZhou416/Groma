@@ -12,7 +12,22 @@ members = []
 edition = "2024"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/RyanZhou416/Groma"
+# MSRV policy (`Docs/DESIGN.md` §2.1): 1.89 is the floor set by the modern
+# generation of every candidate backend — edition 2024 needs 1.85, RustCrypto
+# 0.11 (digest/sha2) needs 1.85, graviola 0.3+ needs 1.89. Raise it only
+# deliberately, only in a minor release, only with a changelog entry.
+# `resolver = "3"` above makes Cargo respect this floor when resolving
+# transitive dependencies (MSRV-aware resolution).
 rust-version = "1.89"
 
 [workspace.dependencies]
 # Intentionally empty until P1. Backend crates pin versions per `Docs/DESIGN.md`.
+
+[workspace.lints.rust]
+# Groma's own crates are safe Rust. A crate that genuinely needs `unsafe` may
+# add a narrow per-item `#[allow(unsafe_code)]` with review, never blanket
+# crate-wide silence.
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+all = "warn"

@@ -1,0 +1,57 @@
+# cargo-deny policy for Groma.
+#
+# Machine-enforces the hard constraint from Docs/SCOPE.md and Docs/HANDOFF.md
+# §7.8: the delivery path must not require any C build toolchain — no
+# `links=` crates, no `*-sys` crates, no cc/cmake/bindgen build dependencies.
+# See .github/workflows/ci.yml (`audit` job) for the enforcement point.
+
+[advisories]
+vulnerability = "deny"
+unmaintained = "warn"
+yanked = "deny"
+notice = "warn"
+ignore = []
+# RUSTSEC-2023-0071 (Marvin, `rsa`): `patched = []`, all versions affected.
+# Risk adjudicated in Docs/DESIGN.md §3.1; if the crate is adopted, record a
+# dated `ignore` entry here pointing at that adjudication, never silently.
+
+[licenses]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "MIT-0",
+    "Unicode-3.0",
+    "Zlib",
+]
+confidence-threshold = 0.8
+exceptions = []
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+deny = [
+    # C build requirements — hard constraint
+    { name = "cc" },
+    { name = "cmake" },
+    { name = "bindgen" },
+    { name = "openssl" },
+    { name = "openssl-sys" },
+    { name = "openssl-src" },
+    { name = "libz-sys" },
+    { name = "ring" },
+    { name = "aws-lc-rs" },
+    { name = "aws-lc-sys" },
+    { name = "aws-lc-fips-sys" },
+    { name = "native-tls" },
+]
+skip = []
+skip-tree = []
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
