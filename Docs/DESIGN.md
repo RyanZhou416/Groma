@@ -48,7 +48,7 @@ that generic libraries cannot express.
 | # | Decision | Options | Notes |
 |---|----------|---------|-------|
 | D1 | `no_std` posture | (a) `core`+`codec` `no_std`+`alloc`, backends unconstrained (b) `std` everywhere | ✅ **已决 2026-09-16：方案 (a)**——合同层 `no_std`+`alloc`，后端适配器不受限（ring/aws-lc-rs 需要 std，不许其后端受限会丢 FIPS 路径） |
-| D2 | Trait dynamism | (a) static generics only (b) `dyn`-compatible traits | Affects object safety and runtime backend selection |
+| D2 | Trait dynamism | (a) static generics only (b) `dyn`-compatible traits (c) dual-layer (d) single-layer object-safe contract | ✅ **已决 2026-09-16：方案 (d)**——族 trait 从第一天起对象安全（构造走 provider 工厂，`finalize` 类用 `mut self: Box<Self>` 接收者，MSRV 1.89 ≥ 1.88 满足）；一套 trait 同时服务静态（零开销）与动态（运行时选后端）两种用法，第三方后端实现一次两种用法自动获得 |
 | D3 | Algorithm enum extensibility | (a) closed non-exhaustive enum (b) open registry | A closed enum is required by contract rule 1; `#[non_exhaustive]` allows growth without breaking |
 | D4 | Backend selection | (a) compile-time features (b) runtime registration (c) both | Both is proposed: features for products, registration for tests and differential runs |
 | D5 | Error taxonomy depth | (a) coarse (b) fine-grained per family | Rule 4 requires distinguishing signature vs encoding at minimum |
@@ -133,3 +133,4 @@ differential harness is the arbiter.
 | 2026-09-16 | Initial design notes: contract shape, open decisions D1–D7, backend characteristics, security engineering rules. |
 | 2026-09-16 | Added §2.1 environment policy (decided): MSRV 1.89, dev toolchain 1.98.1, CI matrix, MSRV change rules. |
 | 2026-09-16 | Decided D1: no_std posture = (a) contract layer `no_std`+`alloc`, backends unconstrained. |
+| 2026-09-16 | Decided D2: trait dynamism = (d) single-layer object-safe contract (factory-based construction, `Box<Self>` receivers); one trait serves both static and dynamic dispatch. |
