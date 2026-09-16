@@ -116,6 +116,7 @@ P1 is strictly serial. Algorithm families inside P3 and formats inside P5 are in
 | Document | Content |
 |----------|---------|
 | [`Docs/SCOPE.md`](Docs/SCOPE.md) | **Authoritative charter**: admission criteria, layers, phases, non-goals, quality gates, governance |
+| [`Docs/GOALS.md`](Docs/GOALS.md) | **Draft** goals: OpenSSL-level coverage statement, reuse-first principle, boundary table, acceptance criteria |
 | [`Docs/HANDOFF.md`](Docs/HANDOFF.md) | **Temporary handoff brief**: structured owner requirements, scope rulings, P1 deliverables and exit criteria, hard constraints, known traps |
 | [`Docs/DESIGN.md`](Docs/DESIGN.md) | Contract design notes and open technical decisions |
 | [`Docs/research/`](Docs/research/) | Ecosystem surveys and the evidence behind the scope |

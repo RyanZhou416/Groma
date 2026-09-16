@@ -146,6 +146,7 @@
 | A3 | 是否引入 CI | 当前无任何 CI | ✅ **已决**：已加发布级 CI（`.github/workflows/ci.yml`：fmt／clippy／test 矩阵［ubuntu＋windows × 1.98.1＋1.89.0 MSRV］／no_std 交叉检查／cargo-deny 禁 C 依赖＋cargo-audit／rustdoc／最小版本／覆盖率／tag 触发 semver-checks＋publish dry-run）＋dependabot |
 | A4 | 第二个后端选谁 | `SCOPE.md` §D6 列为待决 | P1 用最小 in-tree stub 最省；`graviola`／`libcrux` 留到 P3 |
 | A5 | `no_std` 口径（D1）／trait 动态性（D2）／算法枚举扩展方式（D3）／后端选择机制（D4） | 见 [`DESIGN.md`](DESIGN.md) §2 | P1 必须定，晚了改不动 |
+| A6 | "做到 OpenSSL 的水平"的目标声明 | 用户 2026-09-16 提出：功能覆盖度对标＋有现成纯 Rust 实现则引用 | ⏳ 待拍板：草稿见 [`GOALS.md`](GOALS.md)（DRAFT），用户逐条确认后并入 `SCOPE.md`；用户已定推进方式为"边做边定" |
 
 ---
 
@@ -201,3 +202,4 @@
 |------|------|
 | 2026-09-16 | 创建临时接手需求书：结构化用户权威需求 R1–R6、范围裁决、命名与目录约定、P1 交付与出口判据、硬约束、待拍板事项、已知坑、玩家服务边界、接手确认清单。 |
 | 2026-09-16 | 项目正式化：A1 已决（双许可保持，LICENSE-APACHE 换逐字全文）、A2 已决（首发前占名）、A3 已决（发布级 CI 落地）；工具链政策定案（MSRV 1.89，开发工具链 1.98.1，CI 双版本矩阵），写入 `DESIGN.md` §2.1。 |
+| 2026-09-16 | 新增待拍板 A6：OpenSSL 对标目标声明（草稿 `GOALS.md`，DRAFT）；推进方式定案为"边做边定"。 |
