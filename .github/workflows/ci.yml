@@ -10,6 +10,13 @@ name: CI
 #   - minimal dependency versions (nightly)
 #   - coverage (llvm-cov -> codecov), enabled once the first crate exists
 #   - release gates on tags: semver-checks and publish --dry-run
+#
+# The workspace is intentionally empty until P1 (contract freeze) lands the
+# first crate. Cargo's behaviour on a member-less virtual workspace differs
+# across environments (exit 1 / panic 101 on some), so every step that
+# invokes cargo is gated on `hashFiles('Crates/**/Cargo.toml')` and activates
+# automatically the moment the first crate exists. hashFiles() is only valid
+# in step-level conditionals, never in job-level `if`.
 
 on:
   push:
@@ -34,7 +41,9 @@ jobs:
         with:
           toolchain: ${{ env.DEV_TOOLCHAIN }}
           components: rustfmt
-      - run: cargo fmt --all -- --check
+      - name: Format check
+        if: hashFiles('Crates/**/Cargo.toml') != ''
+        run: cargo fmt --all -- --check
 
   clippy:
     name: clippy (stable)
@@ -46,7 +55,9 @@ jobs:
           toolchain: ${{ env.DEV_TOOLCHAIN }}
           components: clippy
       - uses: Swatinem/rust-cache@v2
-      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - name: Clippy
+        if: hashFiles('Crates/**/Cargo.toml') != ''
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
   test:
     name: test (${{ matrix.os }}, ${{ matrix.toolchain }})
@@ -62,7 +73,9 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test --workspace --all-targets
+      - name: Test
+        if: hashFiles('Crates/**/Cargo.toml') != ''
+        run: cargo test --workspace --all-targets
 
   no-std:
     name: no_std build (thumbv7em-none-eabihf)
@@ -74,7 +87,9 @@ jobs:
           toolchain: ${{ env.DEV_TOOLCHAIN }}
           targets: thumbv7em-none-eabihf
       - uses: Swatinem/rust-cache@v2
-      - run: cargo check --workspace --target thumbv7em-none-eabihf
+      - name: no_std cross-check
+        if: hashFiles('Crates/**/Cargo.toml') != ''
+        run: cargo check --workspace --target thumbv7em-none-eabihf
 
   audit:
     name: dependency audit (deny + advisories)
@@ -109,7 +124,9 @@ jobs:
         with:
           toolchain: ${{ env.DEV_TOOLCHAIN }}
       - uses: Swatinem/rust-cache@v2
-      - run: cargo doc --workspace --no-deps
+      - name: rustdoc
+        if: hashFiles('Crates/**/Cargo.toml') != ''
+        run: cargo doc --workspace --no-deps
 
   minimal-versions:
     name: minimal dependency versions (nightly)
@@ -117,8 +134,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
-      - run: cargo update -Z minimal-versions
-      - run: cargo check --workspace --all-targets
+      - name: Resolve minimal versions
+        if: hashFiles('Crates/**/Cargo.toml') != ''
+        run: cargo update -Z minimal-versions
+      - name: Check with minimal versions
+        if: hashFiles('Crates/**/Cargo.toml') != ''
+        run: cargo check --workspace --all-targets
 
   coverage:
     name: coverage (llvm-cov)
