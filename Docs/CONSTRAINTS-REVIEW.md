@@ -24,7 +24,7 @@
 | 4 限长解析/失败关闭/可诊断/不记录秘密 | **保留＋精确化** | 标准支持度最强（ASVS L1 条目直接对应）；rustls SECURITY.md 几乎逐条对应 | "错误可诊断"加限定"诊断信息与秘密脱钩"（呼应 ASVS 7.4.1 通用消息与 D5=(d) 的 Display 纪律）；"不记录秘密"标注为流程条款（无工具） |
 | 5 未经审计不得宣称；形式化验证按覆盖表述 | **保留** | 行业是姿态（BoringSSL"not intended for general use"、ring"experiment"）而非条款；Groma 章程化是合理强化 | 附录 BoringSSL/aws-lc 的 FIPS.md 措辞模板；"形式化验证按真实覆盖表述"保留为自律条款并标注"无标准原文" |
 | 6 FIPS 非目标、不得暗示合规 | **保留＋工具化** | 行业模板：BoringSSL"整体非 FIPS validated"（仅 BCM 获证）、aws-lc 精确措辞；oxicrypt"holds no NIST certificate"是正面样板 | 附行业措辞模板；加 CI 禁词扫描（"FIPS validated/认证/compliant"出现在对外文案即红） |
-| 7 公开向量＋负向用例＋fuzz；演示非安全门 | **保留＋强化（本条最重要）** | 成分均有依据（CAVP/Wycheproof/SSDF/ISO 19790 PCT）；两个失败模式：向量粒度不足（SHAKE 分块、x25519 双向）与缺协议负向（rustls 被审计仍漏两年）；**致命细节：向量必须来自独立来源**（CAVP 刻意由 NIST 生成向量打破自证循环） | 强化为：①向量来源须独立于实现（NIST 文件/Wycheproof/第三方实现交叉）②负向用例须含协议/状态机负向与规范超限拒绝③每个公开密码学 API ≥1 正＋≥1 负（覆盖门禁）④fuzz 自建 cargo-fuzz CI（OSS-Fuzz 对 RustCrypto 覆盖空白，不能指望外部） |
+| 7 公开向量＋负向用例＋fuzz；演示非安全门 | ✅ **已决（2026-09-16）：四条强化全部采用**（经逐条核实）——①向量须来自独立来源（NIST/CAVP 文件、Wycheproof、CCTV 跨实现交叉、第三方实现；"自产向量不得作为正确性证据"，自测/往返健全性检查不禁；OpenSSL 差分 oracle 属独立来源）②负向用例须含协议/状态机负向与规范超限拒绝（吸收 N3/N4；范围随层：P1=CBOR/COSE/DER 重复键/深度/尺寸/非规范编码，协议状态机至 P4 全面铺开；行业模板 BoGo）③公开 API 覆盖门禁（吸收 N5）：每公开密码学 API ≥1 正＋≥1 负（按家族语义），CI 以 cargo-llvm-cov --fail-under-lines 兜底 ④fuzz 自建 cargo-fuzz CI（ubuntu-only＋nightly，libFuzzer 依赖 clang、Windows 不可靠；短时 PR 跑＋定期长跑＋语料与崩溃回归入库） | 原句保留＋四条强化 |
 | 8 交付路径无 C/C++ 构建 | ✅ **已决（2026-09-16）：方案 (a)**——官方发布的所有 crate（核心/补缺/适配器）依赖闭包零 C；不发 ring/aws-lc-rs 适配器（"五个示范后端"缩为 RustCrypto/libcrux/graviola＋stub）；FIPS 消费者经开放合同自写适配器（graviola 的第三方桥模式已证明可行）；全仓一条 CI 门禁可机器验证"官方零 C" | 无标准依据、行业共识度低，但为用户核心动机，保留为硬性且边界收紧为"官方全交付" |
 | 9 范围变更先改章程 | **保留** | 行业通用做法是"先讨论/提案后实现"（Go proposal、rustls"先开 issue"、BoringSSL API-CONVENTIONS）；Groma 的"先改 SCOPE"是机制化表达 | 保留原样 |
 
@@ -63,8 +63,8 @@
 
 - [x] #2 降级：**已决**——四条款版（参考加速为常态＋重写实现＋留痕/许可护栏＋独立验证）
 - [x] #8 边界：**已决**——方案 (a) 官方全交付零 C，不发 ring/aws-lc-rs 适配器
-- [ ] #7 强化四项（独立来源/协议与边界负向/API 覆盖门禁/自建 fuzz）
-- [ ] 新增 N1–N6 是否全收（N5 可并入 #7）
+- [x] #7 强化四项：**已决**——四条全收（核实后附三处细化：独立来源措辞/CCTV、范围随层/BoGo、fuzz ubuntu-only+nightly）
+- [ ] 新增独立约束：N1 恒定时间、N2 依赖治理、N6 密钥生命周期（N3/N4/N5 已并入 #7 条款二/三）
 - [ ] 其余（#1/#3 合并入 N2、#4/#5/#6 精确化、#9 保留）按建议直接改
 - [ ] 修订后的 HANDOFF §7 与 SCOPE 相关条款改写时机（建议与 GOALS/POSITIONING 并入 SCOPE 同期）
 
