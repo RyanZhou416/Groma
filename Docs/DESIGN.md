@@ -47,7 +47,7 @@ that generic libraries cannot express.
 
 | # | Decision | Options | Notes |
 |---|----------|---------|-------|
-| D1 | `no_std` posture | (a) `core`+`codec` `no_std`+`alloc`, backends unconstrained (b) `std` everywhere | (a) is proposed; changing later is expensive for embedded consumers |
+| D1 | `no_std` posture | (a) `core`+`codec` `no_std`+`alloc`, backends unconstrained (b) `std` everywhere | ✅ **已决 2026-09-16：方案 (a)**——合同层 `no_std`+`alloc`，后端适配器不受限（ring/aws-lc-rs 需要 std，不许其后端受限会丢 FIPS 路径） |
 | D2 | Trait dynamism | (a) static generics only (b) `dyn`-compatible traits | Affects object safety and runtime backend selection |
 | D3 | Algorithm enum extensibility | (a) closed non-exhaustive enum (b) open registry | A closed enum is required by contract rule 1; `#[non_exhaustive]` allows growth without breaking |
 | D4 | Backend selection | (a) compile-time features (b) runtime registration (c) both | Both is proposed: features for products, registration for tests and differential runs |
@@ -132,3 +132,4 @@ differential harness is the arbiter.
 |------|--------|
 | 2026-09-16 | Initial design notes: contract shape, open decisions D1–D7, backend characteristics, security engineering rules. |
 | 2026-09-16 | Added §2.1 environment policy (decided): MSRV 1.89, dev toolchain 1.98.1, CI matrix, MSRV change rules. |
+| 2026-09-16 | Decided D1: no_std posture = (a) contract layer `no_std`+`alloc`, backends unconstrained. |
