@@ -146,7 +146,7 @@
 | A3 | 是否引入 CI | 当前无任何 CI | ✅ **已决**：已加发布级 CI（`.github/workflows/ci.yml`：fmt／clippy／test 矩阵［ubuntu＋windows × 1.98.1＋1.89.0 MSRV］／no_std 交叉检查／cargo-deny 禁 C 依赖＋cargo-audit／rustdoc／最小版本／覆盖率／tag 触发 semver-checks＋publish dry-run）＋dependabot |
 | A4 | 第二个后端选谁 | `SCOPE.md` §D6 列为待决 | P1 用最小 in-tree stub 最省；`graviola`／`libcrux` 留到 P3 |
 | A5 | `no_std` 口径（D1）／trait 动态性（D2）／算法枚举扩展方式（D3）／后端选择机制（D4） | 见 [`DESIGN.md`](DESIGN.md) §2 | P1 必须定，晚了改不动 |
-| A6 | "做到 OpenSSL 的水平"的目标声明 | 用户 2026-09-16 提出：功能覆盖度对标＋有现成纯 Rust 实现则引用 | ⏳ 待拍板：草稿见 [`GOALS.md`](GOALS.md)（DRAFT），用户逐条确认后并入 `SCOPE.md`；用户已定推进方式为"边做边定" |
+| A6 | "做到 OpenSSL 的水平"的目标声明与生态位 | 用户 2026-09-16 提出：功能覆盖度对标＋有现成纯 Rust 实现则引用 | ⏳ 待拍板：草稿见 [`GOALS.md`](GOALS.md) 与 [`POSITIONING.md`](POSITIONING.md)（均 DRAFT，证据见 `research/` 四份）；用户已定推进方式为"边做边定" |
 
 ---
 
