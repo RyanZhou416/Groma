@@ -50,7 +50,7 @@ that generic libraries cannot express.
 | D1 | `no_std` posture | (a) `core`+`codec` `no_std`+`alloc`, backends unconstrained (b) `std` everywhere | ✅ **已决 2026-09-16：方案 (a)**——合同层 `no_std`+`alloc`，后端适配器不受限（ring/aws-lc-rs 需要 std，不许其后端受限会丢 FIPS 路径） |
 | D2 | Trait dynamism | (a) static generics only (b) `dyn`-compatible traits (c) dual-layer (d) single-layer object-safe contract | ✅ **已决 2026-09-16：方案 (d)**——族 trait 从第一天起对象安全（构造走 provider 工厂，`finalize` 类用 `mut self: Box<Self>` 接收者，MSRV 1.89 ≥ 1.88 满足）；一套 trait 同时服务静态（零开销）与动态（运行时选后端）两种用法，第三方后端实现一次两种用法自动获得 |
 | D3 | Algorithm enum extensibility | (a) closed non-exhaustive enum (b) open registry | ✅ **已决 2026-09-16：方案 (a)**——封闭 `#[non_exhaustive]` 枚举；加算法=改合同=SCOPE 治理流程（硬约束 9 的机器执行），第三方扩展的正当代言在 D4（后端）而非 D3；`non_exhaustive` 使加变体不打断下游 |
-| D4 | Backend selection | (a) compile-time features (b) runtime registration (c) both | Both is proposed: features for products, registration for tests and differential runs |
+| D4 | Backend selection | (a) compile-time features (b) runtime registration (c) both | ✅ **已决 2026-09-16：方案 (e) 纯构造注入**（研究后选型，替代原 (c)）——合同层零选择机制（无 feature 选择、无全局注册表、无默认后端、无 `install()`）；装载＝普通依赖（伞 crate feature 只作可叠加的 re-export 糖）；选择＝组合根显式传值；注册表＝外围 crate 普通对象。根除 feature 互斥冲突／全局安装／"库替应用做决定"三类生态顽疾 |
 | D5 | Error taxonomy depth | (a) coarse (b) fine-grained per family | Rule 4 requires distinguishing signature vs encoding at minimum |
 | D6 | Which second backend proves P1 | (a) graviola (b) a minimal in-tree stub (c) libcrux | (b) is cheapest and keeps P1 honest; (a)/(c) depend on availability |
 | D7 | Vector storage | (a) vendored in-tree (b) fetched by hash | Licensing and size trade-off; provenance manifest either way |
@@ -135,3 +135,4 @@ differential harness is the arbiter.
 | 2026-09-16 | Decided D1: no_std posture = (a) contract layer `no_std`+`alloc`, backends unconstrained. |
 | 2026-09-16 | Decided D2: trait dynamism = (d) single-layer object-safe contract (factory-based construction, `Box<Self>` receivers); one trait serves both static and dynamic dispatch. |
 | 2026-09-16 | Decided D3: algorithm naming = (a) closed `#[non_exhaustive]` enum; adding an algorithm is a governed contract change. |
+| 2026-09-16 | Decided D4: backend selection = (e) pure constructor injection — zero selection mechanism in the contract, loading via ordinary (additive) dependencies, choice made at the composition root, registry as an out-of-contract crate. |
