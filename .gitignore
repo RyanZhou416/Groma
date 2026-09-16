@@ -1,0 +1,30 @@
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# Cargo lock policy:
+# - libraries: Cargo.lock is committed (workspace root) for reproducible CI
+# - no per-crate lock files
+!/Cargo.lock
+
+# IDE / editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Local scratch / evidence
+/tmp/
+/scratch/
+/vectors/local/
+*.log
+
+# Fuzzing artifacts
+/fuzz/artifacts/
+/fuzz/corpus/
+/fuzz/target/

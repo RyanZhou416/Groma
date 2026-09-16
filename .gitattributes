@@ -1,0 +1,33 @@
+# Normalise to LF in the repository and in the working tree, on every platform.
+# Without this, Windows contributors with core.autocrlf=true would check out CRLF
+# and generate spurious diffs across documentation and vector files.
+* text=auto eol=lf
+
+# Explicit text types
+*.rs        text eol=lf
+*.toml      text eol=lf
+*.md        text eol=lf
+*.json      text eol=lf
+*.txt       text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.rsp       text eol=lf
+*.sha256    text eol=lf
+
+# Windows-only files keep CRLF
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+
+# Binary — never touch
+*.png       binary
+*.jpg       binary
+*.gif       binary
+*.pdf       binary
+*.der       binary
+*.p12       binary
+*.pfx       binary
+*.bin       binary
+
+# Language statistics
+docs/**     linguist-documentation
+vectors/**  linguist-vendored

@@ -1,0 +1,43 @@
+# Apache License, Version 2.0
+
+Copyright 2026 Groma contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+---
+
+## Note on the full text
+
+The complete, canonical Apache License 2.0 text is **not** reproduced verbatim in this file in order
+to keep the repository free of a large duplicated legal document. The authoritative text is
+available from the Apache Software Foundation:
+
+- <https://www.apache.org/licenses/LICENSE-2.0>
+- <https://www.apache.org/licenses/LICENSE-2.0.txt>
+
+Before the first release, this file will be replaced with the verbatim Apache-2.0 text so that the
+published crate artefacts are self-contained. Until then, treat the URL above as the licence text of
+record.
+
+## Why dual licensing
+
+Groma is licensed under `MIT OR Apache-2.0`, the Rust ecosystem convention. This lets downstream
+projects choose whichever licence fits their situation:
+
+- the **MIT** licence is short and permissive, and is the common choice for projects that want
+  minimal conditions;
+- the **Apache-2.0** licence additionally includes an express patent grant and requires that
+  modifications to licensed files be stated.
+
+Third-party dependencies and any vendored test vectors carry their own licences, which are recorded
+in the generated licence inventory once code and vectors land in the repository.

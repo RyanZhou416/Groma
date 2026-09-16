@@ -1,0 +1,18 @@
+[workspace]
+resolver = "3"
+members = []
+
+# Groma — a provider contract and pure-Rust implementations for cryptography.
+#
+# Members are added as each phase of `docs/SCOPE.md` lands. The workspace is
+# intentionally empty until P1 (contract freeze) is implemented, so that the
+# root manifest never advertises crates that do not exist yet.
+
+[workspace.package]
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/RyanZhou416/Groma"
+rust-version = "1.89"
+
+[workspace.dependencies]
+# Intentionally empty until P1. Backend crates pin versions per `docs/DESIGN.md`.
