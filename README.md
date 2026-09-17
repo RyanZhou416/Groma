@@ -119,6 +119,7 @@ P1 is strictly serial. Algorithm families inside P3 and formats inside P5 are in
 | [`Docs/GOALS.md`](Docs/GOALS.md) | **Draft** goals: OpenSSL-level coverage statement, reuse-first principle, boundary table, acceptance criteria |
 | [`Docs/POSITIONING.md`](Docs/POSITIONING.md) | **Draft** niche proposal: ecosystem evidence, candidate positions, differentiation list, risks |
 | [`Docs/CONTENT.md`](Docs/CONTENT.md) | **Draft** content spec: crate map, algorithm/format/trust/platform coverage, phase content, non-goals |
+| [`Docs/PATHS.md`](Docs/PATHS.md) | **Draft** paths spec: filesystem layout, crate dependency graph, module API sketch, reference path rules |
 | [`Docs/HANDOFF.md`](Docs/HANDOFF.md) | **Temporary handoff brief**: structured owner requirements, scope rulings, P1 deliverables and exit criteria, hard constraints, known traps |
 | [`Docs/DESIGN.md`](Docs/DESIGN.md) | Contract design notes and open technical decisions |
 | [`Docs/research/`](Docs/research/) | Ecosystem surveys and the evidence behind the scope |
