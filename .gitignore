@@ -28,3 +28,6 @@ Thumbs.db
 /Fuzz/artifacts/
 /Fuzz/corpus/
 /Fuzz/target/
+
+# AgentTeams session state
+/.agent-teams/
