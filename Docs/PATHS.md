@@ -32,10 +32,13 @@ Groma/
 │  ├─ groma-entropy/           L6（P6）
 │  ├─ groma-adapter-rustls/    L7（P4）
 │  ├─ groma-adapter-quinn/     L7（P4）
-│  └─ groma-adapter-russh/     L7（P4）
+│  ├─ groma-adapter-russh/     L7（P4）
+│  ├─ groma-adapter-openpgp/   L7（后补：rpgp 已纯 Rust，随需加）
+│  └─ groma-adapter-boringtun/ L7（缓发：等上游 PR #479 去 ring）
 ├─ Tools/
 │  ├─ vector-fetch/            独立 manifest（非 workspace 成员）
-│  └─ dependency-audit/        独立 manifest（非 workspace 成员）
+│  ├─ dependency-audit/        独立 manifest（非 workspace 成员）
+│  └─ differential/            差分驱动器（openssl/botan 子进程编排，独立 manifest）
 ├─ Fuzz/
 │  ├─ cose_key/                cargo-fuzz 目标（独立 manifest）
 │  ├─ cbor_bounded/
@@ -98,6 +101,8 @@ Tools/* · Fuzz/* ──→ 独立（各自 manifest）
 
 **★关键设计决定（D4=(e) 的推论）**：获客件与编排件（pkcs12/cms/trust/attestation/tpm/entropy）**零后端硬依赖**——它们的算法执行（PBKDF2/HMAC/验签）全部经 `&dyn Provider` 注入。收益三连：①获客件成为合同的**真实消费者**（第二个练兵场，第一个是 stub）②消费者可换后端（获客件本身可插拔）③获客件依赖树纯净，零 C 审计面最小。测试经 dev-deps 装配 rustcrypto。
 
+**no_std 分层**（D1=(a) 的落实）：core/codec 及获客件的**结构/验证逻辑** `#![no_std]`＋alloc；**网络编排**（OCSP HTTP 客户端等）允许 std 或注入式 HTTP 层（获客件 crate 内模块分层：核心子模块 no_std，http 子模块独立门控）。
+
 ---
 
 ## 4 模块路径（每个 crate 的 API 草图）
@@ -112,7 +117,8 @@ groma-core/src/
 │  password_hash.rs / random.rs     九族对象安全 trait＋工厂（D2）
 ├─ capability.rs     能力查询
 ├─ key.rs            key/signature/nonce/tag/ciphertext newtype
-└─ no_leak.rs        编译期"公开 API 无后端类型"断言
+├─ no_leak.rs        编译期"公开 API 无后端类型"断言
+└─ tests/conformance.rs  公开一致性套件（assert_provider 式；住 core——它测试合同本身）
 
 groma-codec/src/
 ├─ lib.rs            #![no_std] + alloc
@@ -146,6 +152,7 @@ groma-registry/src/lib.rs    Registry::new().register(name, provider)（普通�
 4. **dev-deps 例外**：差分 oracle（openssl CLI 子进程、Botan 样本）只出现在 dev-deps/Tools，永不进正常依赖
 5. **feature 只在 facade**：core/codec/获客件零 feature；facade 的 feature = 装载（可叠加）
 6. **MSRV 传导**：resolver=3 自动把传递依赖锁在 1.89 内
+7. **SPDX 头**：官方 crate 每个源文件带 `SPDX-License-Identifier: MIT OR Apache-2.0`；参考重写的文件按约束 2 ③留痕来源与许可
 
 ---
 
@@ -169,10 +176,11 @@ groma-registry/src/lib.rs    Registry::new().register(name, provider)（普通�
 
 ## 8 待拍板
 
-- [ ] §3 关键决定：获客件**零后端硬依赖**（算法经 provider 注入）——是/否
-- [ ] §1：Tools/Fuzz 独立 manifest 不进 workspace members——是/否
-- [ ] §7：统一 workspace 版本——是/否（vs 各 crate 独立版本）
-- [ ] §4 模块草图逐 crate 粒度是否够用（实现会话可按此开工）
+- [x] §3 关键决定：获客件**零后端硬依赖**（算法经 provider 注入）——已决（2026-09-16）
+- [x] §1：Tools/Fuzz 独立 manifest 不进 workspace members——已决
+- [x] §7：统一 workspace 版本——已决（0.1.0 齐跳）
+- [x] §4 模块草图粒度——已决（实现会话可按此开工）
+- [x] 自查补漏（2026-09-16）：Tools/differential 差分驱动器、adapter-openpgp/boringtun 目录注记、no_std 分层（结构逻辑 no_std／网络编排 std 或注入）、conformance 套件住 core、SPDX 头政策
 - [ ] 定稿后并入 SCOPE §3.3 的时机（与其余草案同批）
 
 ---
@@ -182,3 +190,4 @@ groma-registry/src/lib.rs    Registry::new().register(name, provider)（普通�
 | 日期 | 变更 |
 |------|------|
 | 2026-09-16 | 创建草稿：文件系统布局、逻辑路径五簇映射、crate 依赖图（含"获客件零后端硬依赖"关键决定）、模块 API 草图、引用路径规范、数据工具路径、发布路径、待拍板。 |
+| 2026-09-16 | 四项拍板（零后端硬依赖/独立 manifest/统一版本/草图粒度）＋自查补漏五项（differential 工具、openpgp/boringtun 适配器注记、no_std 分层、conformance 住 core、SPDX 头政策）。 |
