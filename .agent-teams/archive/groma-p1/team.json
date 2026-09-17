@@ -1,0 +1,247 @@
+{
+  "name": "groma-p1",
+  "id": "groma-p1",
+  "description": "Groma P1（合同冻结）＋ P2 R4 兑现：设计冻结 → 合同层（groma-core/groma-codec）与三后端（groma-rustcrypto/groma-stub）并行实现 → 向量与差分基础设施、CI 门禁 → P1 出口判据机器验收 → Ed25519/Argon2/AEAD 的 R4 排期承诺。",
+  "captainSessionId": "session-70a802cf-a3c6-48fb-9784-e2eaaaecde63",
+  "createdAt": 1789624182773,
+  "phase": "staged",
+  "planReviewState": "awaiting_review",
+  "members": [
+    {
+      "id": "",
+      "name": "designer",
+      "role": "合同设计与评审",
+      "provider": "deepseek-official",
+      "model": "deepseek-v4-pro",
+      "reasoningEffort": "max",
+      "joinedAt": 1789624182773,
+      "status": "removed"
+    },
+    {
+      "id": "",
+      "name": "core-impl",
+      "role": "合同层实现",
+      "provider": "deepseek-official",
+      "model": "deepseek-v4-pro",
+      "reasoningEffort": "max",
+      "joinedAt": 1789624182773,
+      "status": "removed"
+    },
+    {
+      "id": "",
+      "name": "codec-impl",
+      "role": "有界解析器实现",
+      "provider": "deepseek-official",
+      "model": "deepseek-v4-pro",
+      "reasoningEffort": "max",
+      "joinedAt": 1789624182773,
+      "status": "removed"
+    },
+    {
+      "id": "",
+      "name": "backend-rustcrypto",
+      "role": "RustCrypto 后端实现",
+      "provider": "deepseek-official",
+      "model": "deepseek-v4-pro",
+      "reasoningEffort": "max",
+      "joinedAt": 1789624182773,
+      "status": "removed"
+    },
+    {
+      "id": "",
+      "name": "stub-impl",
+      "role": "差分后端实现",
+      "provider": "deepseek-official",
+      "model": "deepseek-v4-pro",
+      "reasoningEffort": "max",
+      "joinedAt": 1789624182773,
+      "status": "removed"
+    },
+    {
+      "id": "",
+      "name": "tooling",
+      "role": "向量工具与 CI",
+      "provider": "deepseek-official",
+      "model": "deepseek-v4-pro",
+      "reasoningEffort": "max",
+      "joinedAt": 1789624182773,
+      "status": "removed"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t1",
+      "profileSeedId": "t0-contract-freeze",
+      "subject": "P1 合同设计冻结（trait 面/枚举/错误/manifest/crate 布局）",
+      "description": "工作区 C:\\Project\\Groma。产出合同设计的冻结文档（写入 Crates/groma-core 的模块草图或 Docs/ 设计段），内容包括：①九个算法族 trait（Digest/Mac/Kdf/Aead/Signer/Verifier/Kem/PasswordHash/Random）的对象安全签名草案——已定决策 D2=(d)：构造一律走 provider 工厂方法（如 provider.new_digest(alg)），trait 内禁止 new()->Self，finalize 类收尾用 mut self: Box<Self> 接收者（Rust 1.88+，MSRV 1.89 满足），族 trait 的 dyn 兼容性要有编译期 const 断言；②Algorithm 封闭 #[non_exhaustive] 枚举（D3=(a)）：P1 范围内只列 SHA-256/SHA-384/SHA-512/HMAC-SHA256/HKDF-SHA256/PBKDF2/AES-128/256-GCM/ChaCha20-Poly1305/Ed25519/Argon2id 等实际要用的变体，未知值解析失败；③统一分类错误枚举（D5=(d)）：变体=类别（InvalidSignature/InvalidEncoding/UnsupportedAlgorithm/BackendFailure/ParameterError）而非原因，每类带可选 source: Box<dyn core::error::Error + Send + Sync>（hashed-error 模式），#[non_exhaustive]，Display 不得含秘密；④规范化 newtype（key/signature/nonce/tag/ciphertext）与能力查询接口（backend 声明支持哪些 Algorithm）；⑤Vectors/manifest.toml 条目格式（id/来源URL/版本/sha256/许可/用途/class=vendored|fetched，D7=(d)）；⑥Crates/ 布局：groma-core（合同）、groma-codec、groma-rustcrypto、groma-stub、groma（facade）、groma-registry、Tools/vector-fetch，crate 目录名全小写。硬性环境：edition 2024、MSRV 1.89（rust-version=1.89，依赖必须与之兼容，resolver=3）、合同层 no_std+alloc（D1=(a)）、unsafe 禁止（workspace lints 已 deny，确需时逐点 #[allow] 并注释理由）、官方交付零 C（links/cc/cmake 全禁）。注意 D4=(e)：合同层零选择机制——无 feature 选择、无全局注册表、无默认后端，注册表放 groma-registry 且是普通对象。验收：草案能让 downstream 六个任务（t1/t2/t3 起步）直接开工，无未定接口。",
+      "status": "pending",
+      "dependencies": [],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745352,
+      "handoffId": "472e5fbe-f8f5-4f4b-becc-08d5ac869111",
+      "reassigning": false
+    },
+    {
+      "id": "t2",
+      "profileSeedId": "t1-core",
+      "subject": "groma-core 实现（9 族 trait/规范化类型/能力查询/无泄漏测试）",
+      "description": "在 Crates/groma-core 按 t0 冻结稿实现合同层：9 个族 trait 及工厂、Algorithm 枚举、统一分类错误、newtype、能力查询。no_std+alloc（#![no_std] + extern crate alloc），edition 2024，MSRV 1.89，零 unsafe（确需时逐点 allow+注释，交 designer 评审）。公开 API 不得出现任何后端私有类型：加编译期测试证明——在 core 的 API 里无法命名任何后端 crate 的类型（用 trybuild 或类型级断言）。自带单元测试覆盖每个 trait 的一个最小本地测试实现（不含真实算法）。验证：cargo test、cargo clippy -D warnings 在 Crates/groma-core 全绿；MSRV 腿 cargo +1.89.0 check 通过。",
+      "status": "pending",
+      "dependencies": [
+        "t1"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745353,
+      "handoffId": "f8bbcaf0-9c47-48cf-9eae-01c32408471c",
+      "reassigning": false
+    },
+    {
+      "id": "t3",
+      "profileSeedId": "t2-codec",
+      "subject": "groma-codec 有界 CBOR/COSE/DER 解析＋3 个 fuzz 目标",
+      "description": "在 Crates/groma-codec 实现有界解析器：CBOR（含 COSE Key 结构）、DER（含签名结构）——所有不可信输入入口先限长再解析（大小/深度/元素数上限先于解析，硬约束 4）；重复键拒绝（CBOR map 重复键=错误）；错误走 groma-core 的统一分类错误（InvalidEncoding）。no_std+alloc，edition 2024，MSRV 1.89，零 unsafe。按 HANDOFF P1 交付物建 Fuzz/ 三个 cargo-fuzz 目标：cose_key、cbor_bounded、der_signature（cargo-fuzz 本地可用；CI 接入由 t8 做）。负向用例：超大、超深、重复键、非规范编码必须报错而非崩溃/越界。验证：cargo test、clippy -D warnings 全绿；fuzz 目标 cargo fuzz build 通过。",
+      "status": "pending",
+      "dependencies": [
+        "t1"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745353,
+      "handoffId": "f9e4b219-0b1f-4f8c-a93b-d700e420296d",
+      "reassigning": false
+    },
+    {
+      "id": "t4",
+      "profileSeedId": "t3-vectors",
+      "subject": "向量基础设施：Vectors/manifest.toml＋Tools/vector-fetch＋vendored SHA-256 向量",
+      "description": "按 t0 的 manifest 格式实现：①Vectors/manifest.toml 首批条目：FIPS 180-4 SHA-256 附录样例向量（vendored，来源 https://csrc.nist.gov 或 FIPS 180-4 原文，记录 sha256/许可/用途）、NIST CAVP SHA 短消息向量（fetched 类，来源 NIST CAVP 页面，记录 commit/版本/sha256）②Tools/vector-fetch 工具（独立 crate，不进 workspace members 或用独立 Cargo.toml）：sync（拉 fetched 类并验 sha256 落盘 Vectors/local/，文件名=sha256 内容寻址）、check（对照清单校验 vendored+local，供 CI）、add（登记新条目）③Vectors/local/ 已 gitignore。工具用 toml 解析，零 C 依赖。验证：vector-fetch check 对首批清单通过；手动 sync 后文件落盘且哈希吻合；Vectors/ 下 vendored 文件就位。",
+      "status": "pending",
+      "dependencies": [
+        "t1"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745353,
+      "handoffId": "25ccaf88-5629-4bff-9f9a-958de39bcd51",
+      "reassigning": false
+    },
+    {
+      "id": "t5",
+      "profileSeedId": "t4-stub",
+      "subject": "groma-stub：自写 SHA-256（照 FIPS 180-4 重写）＋CAVP 向量",
+      "description": "在 Crates/groma-stub 实现只覆盖 SHA-256 的最小后端（第二个后端，D6=(b)，差分专用）：照 FIPS 180-4 规范重写（可参考任何语言开源实现但输出必须是真正的 Rust 重写，硬约束 2），用 groma-core 的 Digest 族 trait 与工厂；能力查询声明仅 SHA-256。no_std+alloc，零 unsafe，零 C。测试：FIPS 180-4 附录向量（vendored）＋ NIST CAVP SHA-256 短消息向量（经 vector-fetch sync 后）全部通过；负向：错误长度/状态误用返回分类错误。README 显式标注：差分测试专用、非生产算法。验证：cargo test、clippy -D warnings 全绿。",
+      "status": "pending",
+      "dependencies": [
+        "t1",
+        "t4"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745353,
+      "handoffId": "4702bf7b-c587-4823-b174-b8f5135d9dbe",
+      "reassigning": false
+    },
+    {
+      "id": "t6",
+      "profileSeedId": "t5-rustcrypto",
+      "subject": "groma-rustcrypto 后端：各族适配 RustCrypto 0.11 世代",
+      "description": "在 Crates/groma-rustcrypto 实现第一生产候选后端：Digest（sha2 0.11）、Mac（hmac 0.13）、Kdf（hkdf 0.13/pbkdf2 0.13）、Aead（aes-gcm 0.11/chacha20poly1305 0.11）、Signer/Verifier（ed25519-dalek 3.0）、PasswordHash（argon2 0.6）——全部适配到 groma-core 族 trait；能力查询声明实际支持的 Algorithm 集合。依赖版本须与 MSRV 1.89 兼容（resolver=3 会管），零 C 依赖（禁 ring/aws-lc-rs/openssl）。测试：各算法公开 KAT 向量（NIST/RFC，经 t3 的清单登记）＋每 API ≥1 负向用例（错误标签、错误密钥长度、篡改签名）；HMAC/MAC 校验用 subtle 常量时间比较（硬约束 N1）。注意：不在此任务引入 RSA（Marvin 未修公告，公钥验签也留到后续专门裁决）。验证：cargo test、clippy -D warnings 全绿；cargo deny 无 C 依赖违禁项。",
+      "status": "pending",
+      "dependencies": [
+        "t1",
+        "t4"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745353,
+      "handoffId": "e5837d35-9b48-4a5e-9eb4-ff096f331886",
+      "reassigning": false
+    },
+    {
+      "id": "t7",
+      "profileSeedId": "t6-differential",
+      "subject": "双后端差分测试＋conformance 套件",
+      "description": "证明抽象正确性的关键任务：①groma-core 内建 conformance 套件（类似 rtc-crypto 的 assert_provider）：任何实现族 trait 的后端可运行统一行为断言②双后端（groma-stub 与 groma-rustcrypto 的 SHA-256）在共享向量集（FIPS 180-4＋CAVP 经 manifest 登记）上结论一致——同一进程两后端对比（D4=(e) 值式注入使此可行），用 proptest 随机输入交叉对比（graviola crosschecks.rs 模式）③公开 API 无后端类型泄漏的编译期测试。验证：cargo test 含差分用例全绿；文档记录差分结论。",
+      "status": "pending",
+      "dependencies": [
+        "t2",
+        "t5",
+        "t6"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745353,
+      "handoffId": "4c0aaf46-6a61-46da-b50e-b91af5f60c0b",
+      "reassigning": false
+    },
+    {
+      "id": "t8",
+      "profileSeedId": "t7-facade",
+      "subject": "groma facade（可叠加 feature）＋groma-registry＋文档收尾",
+      "description": "①Crates/groma：伞 crate，feature 仅作装载（re-export 各后端构造器），可叠加不互斥（D4=(e) 的'装载'层），默认 feature 只含 core＋codec＋rustcrypto 后端②Crates/groma-registry：普通对象 Registry::new().register(name, provider)，自己拥有自己传，绝无全局状态③更新 Docs/DESIGN.md §2 将 D1–D7 全部标记已决（若 t0 未做）④README/CONTRIBUTING 提词句与十二章硬约束一致。验证：cargo test --workspace 全绿；feature 叠加（rustcrypto+stub 同开）编译通过。",
+      "status": "pending",
+      "dependencies": [
+        "t2",
+        "t5",
+        "t6"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745352,
+      "handoffId": "70290f66-03ba-4578-8aac-ebd6c79b0055",
+      "reassigning": false
+    },
+    {
+      "id": "t9",
+      "profileSeedId": "t8-ci",
+      "subject": "CI 门禁接入：fuzz job/dudect 骨架/无 C 检查/覆盖门禁/依赖审计",
+      "description": "基于现有 .github/workflows/ci.yml（已双 OS×双工具链矩阵）接入 P1 门禁：①fuzz job：ubuntu-only＋nightly，短时运行三个 fuzz 目标（cargo fuzz 需要 clang）②无 C 检查：cargo metadata 过滤 links 字段＋cargo tree -e build 查 cc/cmake/bindgen 构建依赖（Tools/dependency-audit 的 P1 交付物，做成小工具或脚本并接入 audit job）③deny.toml 白名单补充 RustCrypto 依赖许可④dudect 骨架：先落地 harness（crates 无秘密路径时可标注 N/A，结构就位）⑤覆盖门禁：cargo-llvm-cov --fail-under-lines 阈值（coverage job 已备）⑥cargo-deny/cargo-audit 已接，验证与新增依赖相容。验证：本地跑通每条命令；workflow 语法有效。",
+      "status": "pending",
+      "dependencies": [
+        "t2",
+        "t3"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745353,
+      "handoffId": "1ed48e78-abf6-48ce-a3be-7703a57a7bc9",
+      "reassigning": false
+    },
+    {
+      "id": "t10",
+      "profileSeedId": "t9-p1-exit",
+      "subject": "P1 出口判据机器验收",
+      "description": "对照 HANDOFF §6 四个出口判据逐条机器验证并出验收报告（写入 Docs/ 或任务输出）：①公开 API 无后端类型泄漏（t1/t6 的编译期测试过）②第三方可在不改 groma-core 前提下新增后端（stub 即证明，报告陈述证明方式）③两个后端在共享向量集上结论一致（t6 差分全绿）④CBOR/COSE/DER 对超大/超深/重复键/非规范输入不崩溃不越界不无界分配（t2 负向测试＋fuzz 构建）。同时检查：no_std 交叉编译 job 绿、MSRV 1.89 腿绿、工作区 cargo test --workspace 全绿、deny/audit 无违禁。输出逐判据 pass/fail 证据表；任一 fail 则列出阻塞项与修复指派。",
+      "status": "pending",
+      "dependencies": [
+        "t3",
+        "t7",
+        "t8",
+        "t9"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745352,
+      "handoffId": "488e3a18-a85e-473f-a9be-0d263a118011",
+      "reassigning": false
+    },
+    {
+      "id": "t11",
+      "profileSeedId": "t10-r4",
+      "subject": "P2 R4 兑现：Ed25519/Argon2/AEAD 全向量＋负向（玩家服务排期承诺）",
+      "description": "在 groma-rustcrypto 后端上兑现 R4（HANDOFF §2/§10 的排期承诺，必须保住）：Ed25519 签名/验签、Argon2id 口令哈希、AES-GCM 与 ChaCha20-Poly1305 AEAD——覆盖 RFC 8032（Ed25519 测试向量＋篡改负向）、Argon2 参考向量（RFC 9106 或 PHC 官方）、NIST AES-GCM 向量（GCM 规范附件）与 Wycheproof 相关负向（超长 AAD 拒绝、错误 tag 拒绝等，经 manifest 登记）。验证：全向量过＋每 API 负向过；写一小节消费者视角用法示例（值式注入构造 provider 做签名/加密）。",
+      "status": "pending",
+      "dependencies": [
+        "t10"
+      ],
+      "attempt": 0,
+      "createdAt": 1789624182773,
+      "updatedAt": 1789624745353,
+      "handoffId": "57baceb7-3331-48f9-a9c2-be49804ac75f",
+      "reassigning": false
+    }
+  ],
+  "taskSeq": 11
+}
