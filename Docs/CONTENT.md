@@ -18,6 +18,8 @@
 5. **纳入证据四格**（2026-09-16 用户确立）：每个候选条目须过——①Rust 现状（有/无、活/死、版本/维护/采用）②**死因**（若死：占名未实现／被吸收合并／低需求停摆／停维仍活／架构废弃）③**跨语言参照**（OpenSSL/Go/Java 有无成熟实现；"他有我无"是稀缺件的强定义）④三判据＋双锚点落点。**死因决定动作**：占名未实现且 C 有 → **自构补缺**（真稀缺件）；被吸收合并 → 指向后继不动作；低需求停摆 → deferred（判据③不过）；停维但需求仍活 → 依赖＋N2 标注（收养维护列预案）；架构废弃 → 指向后继不动作。
    **方法论警告（复核轮教训）**：`max_stable_version` 字段会掩盖活跃的 pre/rc 发布线——判定"死/停维"必须同时查：稳定版＋pre/rc 线＋上游仓库真实活动；crates.io 命名陷阱（占位 crate、同名不同义、未发布 workspace 成员）须逐一甄别。
 6. **分层归类规则**（2026-09-16 内部分类审查定案）：①L3 分两个子面——**算法面**（后端实现的原子算法）与**构造面**（HPKE/FROST/AES-KW 等合同之上自研组合，消费合同而非实现合同）②"**结构/格式**"归 L4、"**验证/信任判断**"归 L5（TSA 结构→L4、验证→L5，crate 内分模块）③L6 广义化为"**平台与厂商证明**"（TPM/Android Key/Apple App Attest/PKCS#11/熵）；FIDO MDS3 归 L5（与 OCSP/CT 同质）④crate 粒度维持 22 项，按五簇组织呈现（地基/算法/获客/平台/适配）。
+7. **对外叙事收敛规则**（2026-09-16 用户拍板）：对外沟通只以三样为主体——**获客件（验证级编排稀缺件）＋统一合同＋无 C 构建**；合同覆盖件（secp256k1/BLS/HPKE/FROST/AES-KW 等适配）**不得作为卖点**（开发者直接引用上游同样成立），官方适配器标"低优先级/社区可做"（合同开放，第三方写适配器同样成立）；官方精力集中在获客件与 rustls 适配器。
+8. **竞争策略**（2026-09-16 用户拍板）：取代对象是 **aws-lc-rs**（rustls 底下的 C），不是 rustls（rustls 是分销渠道）；**aws-lc-rs 的 FIPS 段永远不碰**（R6），其余市场段错位竞争；取代路径三步见 `POSITIONING.md`。
 
 ---
 
@@ -41,10 +43,10 @@
 | `groma-tpm` | L6 | P6 | 自研补缺（TPM 2.0 结构与证明验证） | 已决＋路线图提前公告 |
 | `groma-entropy` | L6 | P6 | 自研补缺（SP 800-90B 熵健康＋DRBG） | 已决 |
 | `groma-adapter-*`（rustls/quinn/russh/boringtun/openpgp） | L7 | P4 | 自研薄适配器 | 已决 |
-| `groma-hpke` | L3 | P2 | 自研构造（RFC 9180＝KEM/KDF/AEAD 组合；可适配 hpke 0.14 或自组于合同） | 已决（加法轮） |
-| `groma-frost` | L3 | P2/P3 | 复用适配（frost-* 3.0，RFC 9591 定稿） | 已决（加法轮） |
-| `groma-bls` | L3 | P2 | 复用适配（zkcrypto bls12_381；签名层按 CFRG draft 语义） | 已决（加法轮） |
-| `groma-keywrap` | L4 | P1/P2 | 复用适配（aes-kw 0.3.1；服务 PKCS#8/CMS/JWE 格式层） | 已决（加法轮） |
+| `groma-hpke` | L3 | P2 | 自研构造（RFC 9180＝KEM/KDF/AEAD 组合；可适配 hpke 0.14 或自组于合同） | 已决（低优先级/社区可做） |
+| `groma-frost` | L3 | P2/P3 | 复用适配（frost-* 3.0，RFC 9591 定稿） | 已决（低优先级/社区可做） |
+| `groma-bls` | L3 | P2 | 复用适配（zkcrypto bls12_381；签名层按 CFRG draft 语义） | 已决（低优先级/社区可做） |
+| `groma-keywrap` | L4 | P1/P2 | 复用适配（aes-kw 0.3.1；服务 PKCS#8/CMS/JWE 格式层） | 已决（低优先级/社区可做） |
 | `groma-cose` | L4 | P2 | 自研编排（coset 结构＋Sig_structure 组装＋backend 验签） | 已决（加法轮） |
 | `groma-attestation` | L6 | 中期 | 自研补缺（Android Key/Play Integrity＋Apple App Attest＋FIDO MDS3 验证与缓存） | 已决（加法轮） |
 | `groma-tsa` | L4/L5 | 中期 | 自研编排（RFC 3161；x509-tsp/cms 积木＋验证） | 已决（加法轮） |
@@ -69,12 +71,18 @@
 - 后量子签名：**ML-DSA-44/65/87**（经 `groma-libcrux`＋RustCrypto 双路）；**SLH-DSA 有条件纳入**（复核轮修正：非停滞——0.1.0 即 FIPS 205 定稿版、0.2.0-rc.5 活跃；跟踪 0.2.0 正式版，P3 后段、ML-DSA 之后；libcrux 无 SLH-DSA 计划）
 - 口令哈希：scrypt、bcrypt
 
-**加法轮新增（2026-09-16 用户全收）**：
-- **secp256k1**（k256 0.14 适配：ECDSA＋BIP340 Schnorr）——Bitcoin/Cosmos 生态规模消费者，P2；OpenSSL 有曲线无 BIP340（半超对标面）
-- **HPKE**（RFC 9180 **构造面**：适配 hpke 0.14 或于合同自组 KEM/KDF/AEAD 组合）——MLS/ECH/OHTTP 消费者，P2；OpenSSL 3.2+ 有（对标内）
-- **AES-KW/KWP**（**构造面**：aes-kw 0.3.1；SP 800-38F＋RFC 3394/5649＋Wycheproof aes_kwp）——服务 PKCS#8/CMS/JWE（pkcs8 0.11 尚未接 aes-kw，Groma 补），P2
-- **BLS12-381 签名**（**算法面**：zkcrypto bls12_381 0.9 适配；CFRG draft-07 语义，向量用 ETH2 consensus-spec-tests 补附录 TBA）——**超出 OpenSSL 对标面**（OpenSSL 至今无 BLS），Ethereum/Filecoin 消费者，P2
-- **FROST 门限签名**（**构造面**：frost-* 3.0 适配；RFC 9591 定稿含向量）——**超出对标面**，MPC 钱包消费者，P2/P3
+**加法轮新增（2026-09-16 用户全收；适配类标"低优先级/社区可做"——对外叙事不作为卖点）**：
+- **secp256k1**（k256 0.14 适配：ECDSA＋BIP340 Schnorr）——Bitcoin/Cosmos 生态规模消费者，P2；OpenSSL 有曲线无 BIP340（半超对标面）；**低优先级/社区可做**
+- **HPKE**（RFC 9180 **构造面**：适配 hpke 0.14 或于合同自组 KEM/KDF/AEAD 组合）——MLS/ECH/OHTTP 消费者，P2；OpenSSL 3.2+ 有（对标内）；**低优先级/社区可做**
+- **AES-KW/KWP**（**构造面**：aes-kw 0.3.1；SP 800-38F＋RFC 3394/5649＋Wycheproof aes_kwp）——服务 PKCS#8/CMS/JWE（pkcs8 0.11 尚未接 aes-kw，Groma 补），P2；**低优先级/社区可做**
+- **BLS12-381 签名**（**算法面**：zkcrypto bls12_381 0.9 适配；CFRG draft-07 语义，向量用 ETH2 consensus-spec-tests 补附录 TBA）——**超出 OpenSSL 对标面**（OpenSSL 至今无 BLS），Ethereum/Filecoin 消费者，P2；**低优先级/社区可做**
+- **FROST 门限签名**（**构造面**：frost-* 3.0 适配；RFC 9591 定稿含向量）——**超出对标面**，MPC 钱包消费者，P2/P3；**低优先级/社区可做**
+
+**补漏轮（2026-09-16 OpenSSL 对照发现，用户全收；均为引用适配）**：
+- **SM2/SM3/SM4 国密**（RustCrypto sm2 0.13.3/sm3/sm4；GM/T 规范＋官方向量）——中国市场合规消费者；OpenSSL 对标面的正面缺口，P3
+- **XTS**（RustCrypto xts-mode；IEEE 1619 向量）——全磁盘加密（dm-crypt/BitLocker/VeraCrypt），P3
+- **FFDHE（RFC 7919）**（RustCrypto DH；RFC 7919 向量）——TLS DHE 套件消费者，P3
+- **AES-SIV（RFC 5297）**（RustCrypto aes-siv；RFC 5297 向量）——密钥包装类确定性加密，P3
 
 **契约预留（实现暂缓）**：
 - **X-Wing 混合 KEM**：individual I-D 已于 2026-09 过期未转 RFC（三判据①不齐），但 BoringSSL/CIRCL/orion 已实现、码点 0x647A 在用——L3 只抽象"混合 KEM"契约，X-Wing 作实验后端，RFC 定稿转正
@@ -166,7 +174,7 @@
 
 | 不做 | 为什么 | 消费者去哪 |
 |---|---|---|
-| FIPS 140-3 验证 | R6；换语言不可继承 | aws-lc-rs（有 C）/自接适配器 |
+| FIPS 140-3 验证 | R6；换语言不可继承；**FIPS 段永远不碰（2026-09-16 用户定）** | aws-lc-rs（有 C）/自接适配器 |
 | openssl CLI 等价物 | **已决（2026-09-16）：不做**——产品化工具非库层 | — |
 | JOSE/JWS | jsonwebtoken 已纯 Rust 化（trait 化后端） | jsonwebtoken |
 | SSH 密钥格式 | ssh-key 成熟（1140 万下载） | ssh-key |
@@ -188,6 +196,9 @@
 - [x] **复核调研轮**：已完成（四线：跨语言差集／自构可行性／裁决项复核／依赖上游）——真缺口收窄（SP 800-90B、CT 客户端层）、SLH-DSA 有条件纳入、SHA-1/MD5 均 deferred、Ed448/X448/pkcs1 撤销停维、KMAC/GMAC 改拼装件、PKCS#10 改装配 x509-cert、X.509 底座 pkix-path、TPM 改 attestation 子集、RSA 增复查触发、boringtun 3 处 ring＋PR #479 监控
 - [x] **加法轮**（用户指示"继续做加法"，两线调研 15 候选）：11 项全收（COSE_Sign1/Android/Apple/MDS3/TSA/secp256k1/HPKE/AES-KW/OID/BLS/FROST），4 项暂缓（X-Wing、LMS/XMSS 契约预留；CMP/EST/SCEP 中 SCEP 排除；Kerberos 远期）；定位扩张为"OpenSSL 对标面＋现代生态超集"（GOALS §1 已记）
 - [x] **内部分类审查**：已定案——L3 分算法面/构造面、结构→L4 验证→L5、MDS3 归 L5、L6 广义化"平台与厂商证明"、五簇呈现、契约预留补记 DESIGN.md（D8 混合 KEM/D9 有状态签名）
+- [x] **对外叙事收敛**（2026-09-16 用户拍板）：获客件＋合同＋无 C 为主体；BLS/FROST/secp256k1/HPKE/AES-KW 官方适配器标"低优先级/社区可做"；官方精力集中在获客件与 rustls 适配器
+- [x] **竞争策略**：取代对象=aws-lc-rs（非 rustls）；FIPS 段永远不碰；其余错位竞争（对照表与取代路径三步见 POSITIONING）
+- [x] **补漏轮**（OpenSSL 对照发现 4 项）：SM2/SM3/SM4、XTS、FFDHE、AES-SIV 全收（引用适配，P3）
 - [ ] §6 实现顺序：**最后定**（用户指示）
 - [ ] 定稿后并入 SCOPE 的时机（建议 P1 出口时）
 
