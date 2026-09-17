@@ -106,7 +106,7 @@
 - **加法轮：COSE_Sign1 编排（`groma-cose`）**——coset 0.4.2 结构底座（23.2M 下载、Android vendor）；Groma 自研 Sig_structure 组装＋backend 验签映射（ES256/RS256/EdDSA）；RFC 9052/9053＋cose-wg Examples 官方向量；**OpenSSL 无 COSE**（超对标）；消费者 FIDO/passkey/SCITT，P2
 - **加法轮：TSA 时间戳（`groma-tsa`）**——RFC 3161；x509-tsp/cms/sigstore-tsa 积木全纯 Rust；Groma 自研一站式客户端＋TimeStampToken 验证（**结构→L4、验证→L5，crate 内分模块**）；oracle=openssl ts；代码签名/PDF/eIDAS 消费者，中期
 - **加法轮：OID 注册表**——复用 const-oid 0.10（4.6 亿下载），L4 基础设施无新 crate
-- **P2+：PKCS#12 创建＋MAC 校验（获客首发）**——底座：RustCrypto pkcs12（结构/KDF）＋der/pkcs5/pkcs8 成熟；Groma 自建：PKCS12 KDF 变体＋PBMAC1 封装＋端到端创建/解析开箱接口。向量：RFC 7292 无向量，但 OpenSSL ~40＋Botan ~50 个 .p12 样本（含 RFC 9579 PBMAC1 全套负向）＋openssl pkcs12 全参数双向差分——立即可做
+- **P2+：PKCS#12 创建＋MAC 校验（获客首发）**——**形式已决（2026-09-16）：自研（缩范围 ~1.5–2k 行）**：照 RFC 7292 自写创建＋MAC 校验（现代算法路径：AES-256-CBC PBE＋HMAC-SHA256；legacy 解析复用 RustCrypto pkcs12）；**自带 OpenSSL/Botan 双向差分验证（获客件的信任核心）**。减法轮发现 p12-keystore 0.3.2 已覆盖创建，但踩 pre 线（pkcs12 0.2.0-pre＋cms 0.3.0-pre）、无差分、文档 42%——"现成不满足才自研"成立（稳定线铁律＋无差分＋无审计三点均不满足）；PKCS#12 同时是合同 Digest/Mac/Kdf 族的第一个真实消费者（合同练兵）。向量：OpenSSL ~40＋Botan ~50 个 .p12 样本（含 RFC 9579 PBMAC1 全套负向）＋openssl pkcs12 全参数双向差分——立即可做
 - P5：CMS/PKCS#7——底座 cms 0.2.3 解析层完整；Groma 自建 verify()（300–500 行：eContent 摘要→signedAttrs→验签→x509-cert 链校验）；语料 OpenSSL smime-eml/cms-msg 负向＋openssl cms 双向差分——立即可做
 
 **L5 信任**（P5）：
