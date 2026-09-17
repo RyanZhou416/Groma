@@ -54,6 +54,8 @@ that generic libraries cannot express.
 | D5 | Error taxonomy depth | (a) coarse (b) fine-grained per family | ✅ **已决 2026-09-16：方案 (d) 统一分类枚举＋源链**（研究后选型，替代原 (a)/(b)）——单一 `#[non_exhaustive]` 枚举，变体＝类别（`InvalidSignature`／`InvalidEncoding`／`UnsupportedAlgorithm`／`BackendFailure`／`ParameterError`）而非原因；原因走 `source()` 链（signature crate 的 hashed-error 模式）；Display 不含密钥/明文。可匹配防 fail-open、细节不入 match 防错误预言机、枚举不爆炸防 semver 抖动；统一类型也是 D2=(d) 对象安全合同的必然推论 |
 | D6 | Which second backend proves P1 | (a) graviola (b) a minimal in-tree stub (c) libcrux | ✅ **已决 2026-09-16：方案 (b)**——`groma-stub`：照 FIPS 180-4＋CAVP 公开向量自写 SHA-256（差分测试专用、非生产、显式豁免于"不重写算法"约束的精神——不发货不竞争）；graviola 主场 P3/P4（高性能＋rustls 桥）、libcrux 主场 P3（PQC），均不在合同冻结期引入 |
 | D7 | Vector storage | (a) vendored in-tree (b) fetched by hash (c) hybrid (d) single-manifest content-addressed | ✅ **已决 2026-09-16：方案 (d)**——`Vectors/manifest.toml` 单一清单（id/来源/版本/sha256/许可/用途/class），vendored vs fetched 只是清单字段；`Vectors/local/` 内容寻址缓存（文件名=sha256 自证）；`Tools/vector-fetch` 三命令（sync/check/add）；测试按 ID 加载、切换 class 零代码改动；向量仅测试用不随 crate 发布，crates.io 10MB 限制从设计上消失 |
+| D8 | 混合 KEM 契约预留 | X-Wing：individual I-D 已于 2026-09 过期未转 RFC；BoringSSL/CIRCL/orion 已实现、码点 0x647A 在用 | ⏳ **预留（加法轮定案）**：P1 合同在 Kem 族留"混合"形态扩展点（组合 KEM 接口设计），X-Wing 作实验后端，RFC 定稿后转正 |
+| D9 | 有状态签名契约预留 | LMS/XMSS：RustCrypto 官方 rc/pre 线；OpenSSL 3.6 已有 LMS 验证；CNSA 2.0 固件签名需求 | ⏳ **预留（加法轮定案）**：Signer 族留有状态变体扩展点（状态管理 API 设计），实现暂缓至生态成熟 |
 
 ### 2.1 Environment policy (decided 2026-09-16)
 
@@ -139,3 +141,4 @@ differential harness is the arbiter.
 | 2026-09-16 | Decided D5: error model = (d) unified classified enum + source chain — variants are classes not causes, hashed-error source chain, no secrets in Display. |
 | 2026-09-16 | Decided D6: second P1 backend = (b) minimal in-tree stub (`groma-stub`, self-written SHA-256 from FIPS 180-4 + CAVP vectors, differential-only). |
 | 2026-09-16 | Decided D7: vector storage = (d) single-manifest content-addressed architecture (one manifest, sha256-named cache, one tool, ID-based access). D1–D7 complete. |
+| 2026-09-16 | Added contract reservations D8 (hybrid KEM shape) and D9 (stateful signature shape) from the addition round; P1 must leave extension points. |
