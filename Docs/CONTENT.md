@@ -40,6 +40,15 @@
 | `groma-tpm` | L6 | P6 | 自研补缺（TPM 2.0 结构与证明验证） | 已决＋路线图提前公告 |
 | `groma-entropy` | L6 | P6 | 自研补缺（SP 800-90B 熵健康＋DRBG） | 已决 |
 | `groma-adapter-*`（rustls/quinn/russh/boringtun/openpgp） | L7 | P4 | 自研薄适配器 | 已决 |
+| `groma-hpke` | L3 | P2 | 自研构造（RFC 9180＝KEM/KDF/AEAD 组合；可适配 hpke 0.14 或自组于合同） | 已决（加法轮） |
+| `groma-frost` | L3 | P2/P3 | 复用适配（frost-* 3.0，RFC 9591 定稿） | 已决（加法轮） |
+| `groma-bls` | L3 | P2 | 复用适配（zkcrypto bls12_381；签名层按 CFRG draft 语义） | 已决（加法轮） |
+| `groma-keywrap` | L4 | P1/P2 | 复用适配（aes-kw 0.3.1；服务 PKCS#8/CMS/JWE 格式层） | 已决（加法轮） |
+| `groma-cose` | L4 | P2 | 自研编排（coset 结构＋Sig_structure 组装＋backend 验签） | 已决（加法轮） |
+| `groma-attestation` | L6 | 中期 | 自研补缺（Android Key/Play Integrity＋Apple App Attest＋FIDO MDS3 验证与缓存） | 已决（加法轮） |
+| `groma-tsa` | L4/L5 | 中期 | 自研编排（RFC 3161；x509-tsp/cms 积木＋验证） | 已决（加法轮） |
+
+> **层位映射提案（待内部分类审查确认，2026-09-16）**：secp256k1→groma-rustcrypto 扩展（L3）；OID 注册表→复用 const-oid（L4 基础设施，无新 crate）；X-Wing→L3 契约预留（Kem 混合模式，实验后端）；LMS/XMSS→L3 契约预留（有状态签名家族，实现暂缓）。
 
 ---
 
@@ -57,6 +66,17 @@
 - 后量子签名：**ML-DSA-44/65/87**（经 `groma-libcrux`＋RustCrypto 双路）；**SLH-DSA 有条件纳入**（复核轮修正：非停滞——0.1.0 即 FIPS 205 定稿版、0.2.0-rc.5 活跃；跟踪 0.2.0 正式版，P3 后段、ML-DSA 之后；libcrux 无 SLH-DSA 计划）
 - 口令哈希：scrypt、bcrypt
 
+**加法轮新增（2026-09-16 用户全收）**：
+- **secp256k1**（k256 0.14 适配：ECDSA＋BIP340 Schnorr）——Bitcoin/Cosmos 生态规模消费者，P2；OpenSSL 有曲线无 BIP340（半超对标面）
+- **HPKE**（RFC 9180 构造：适配 hpke 0.14 或于合同自组 KEM/KDF/AEAD 组合）——MLS/ECH/OHTTP 消费者，P2；OpenSSL 3.2+ 有（对标内）
+- **AES-KW/KWP**（aes-kw 0.3.1；SP 800-38F＋RFC 3394/5649＋Wycheproof aes_kwp）——服务 PKCS#8/CMS/JWE（pkcs8 0.11 尚未接 aes-kw，Groma 补），P2
+- **BLS12-381 签名**（zkcrypto bls12_381 0.9 适配；CFRG draft-07 语义，向量用 ETH2 consensus-spec-tests 补附录 TBA）——**超出 OpenSSL 对标面**（OpenSSL 至今无 BLS），Ethereum/Filecoin 消费者，P2
+- **FROST 门限签名**（frost-* 3.0 适配；RFC 9591 定稿含向量）——**超出对标面**，MPC 钱包消费者，P2/P3
+
+**契约预留（实现暂缓）**：
+- **X-Wing 混合 KEM**：individual I-D 已于 2026-09 过期未转 RFC（三判据①不齐），但 BoringSSL/CIRCL/orion 已实现、码点 0x647A 在用——L3 只抽象"混合 KEM"契约，X-Wing 作实验后端，RFC 定稿转正
+- **LMS/XMSS 有状态签名**：RustCrypto 官方仍在 rc/pre 线；OpenSSL 3.6 已有 LMS 验证（对标面在动）——L3 预留"有状态签名"契约（含状态管理 API），实现暂不承诺；CNSA 2.0 固件签名需求真实（oxicrypt 即为此而生）
+
 **P6**：HMAC-DRBG、熵源健康（SP 800-90B 对接）。
 
 **裁决项（已决 2026-09-16，经复核轮修订）**：
@@ -72,6 +92,9 @@
 **L4 格式**：
 - P1：PEM、DER（codec 有界解析子集）
 - P3：PKCS#8、SPKI、PKCS#1、SEC1、CSR（**复核轮修正：PKCS#10 已由 x509-cert＋rcgen 覆盖，Groma 不重造**，装配 x509-cert 的 CertReq）
+- **加法轮：COSE_Sign1 编排（`groma-cose`）**——coset 0.4.2 结构底座（23.2M 下载、Android vendor）；Groma 自研 Sig_structure 组装＋backend 验签映射（ES256/RS256/EdDSA）；RFC 9052/9053＋cose-wg Examples 官方向量；**OpenSSL 无 COSE**（超对标）；消费者 FIDO/passkey/SCITT，P2
+- **加法轮：TSA 时间戳（`groma-tsa`）**——RFC 3161；x509-tsp/cms/sigstore-tsa 积木全纯 Rust；Groma 自研一站式客户端＋TimeStampToken 验证；oracle=openssl ts；代码签名/PDF/eIDAS 消费者，中期
+- **加法轮：OID 注册表**——复用 const-oid 0.10（4.6 亿下载），L4 基础设施无新 crate
 - **P2+：PKCS#12 创建＋MAC 校验（获客首发）**——底座：RustCrypto pkcs12（结构/KDF）＋der/pkcs5/pkcs8 成熟；Groma 自建：PKCS12 KDF 变体＋PBMAC1 封装＋端到端创建/解析开箱接口。向量：RFC 7292 无向量，但 OpenSSL ~40＋Botan ~50 个 .p12 样本（含 RFC 9579 PBMAC1 全套负向）＋openssl pkcs12 全参数双向差分——立即可做
 - P5：CMS/PKCS#7——底座 cms 0.2.3 解析层完整；Groma 自建 verify()（300–500 行：eContent 摘要→signedAttrs→验签→x509-cert 链校验）；语料 OpenSSL smime-eml/cms-msg 负向＋openssl cms 双向差分——立即可做
 
@@ -84,6 +107,7 @@
 **L6 平台**（P6）：
 - **TPM 2.0**：底座 tpm2-protocol 1.2.0（wire 编解码，作者为内核 TPM 维护者 Jarkko）；Groma 做 attestation 验证子集（quote 验签＋PCR 摘要，难度中）；完整客户端（会话 HMAC/命令级 API）不做——P 期再议；oracle=TCG 模拟器＋tpm2-tools
 - PKCS#11 密码学缺口（ABI 用 cryptoki，不重造）
+- **加法轮：厂商证明验证（`groma-attestation`）**——Android Key/Play Integrity 证明（octet-attest-verify 底座：嵌入 Google 根含 2026-02 P-384 新根；无在线吊销列已知限制）、Apple App Attest（CBOR＋链到 Apple 根＋nonce/counter）、FIDO MDS3 验证与缓存（fido-mds 0.6-dev 已纯 Rust 未发布，Groma 接 L1 provider）；消费者 WebAuthn RP（webauthn-rs 链验证至今走 OpenSSL）；中期
 - **SP 800-90B 熵健康＋jitter 熵源**（复核轮确认：唯一完整真缺口——纯 Rust 只有 GPL 未验证脚手架；NIST 评估工具与 libjitterentropy 为 C；自研评估套件＋可验证熵源，P6）
 - HMAC-DRBG
 
@@ -158,6 +182,8 @@
 - [x] §2 裁决项：已决（RSA 按操作分权；SHA-1 legacy opt-in、MD5 deferred）
 - [x] §7 不做清单：已确认（含 CLI 不做）
 - [x] **复核调研轮**：已完成（四线：跨语言差集／自构可行性／裁决项复核／依赖上游）——真缺口收窄（SP 800-90B、CT 客户端层）、SLH-DSA 有条件纳入、SHA-1/MD5 均 deferred、Ed448/X448/pkcs1 撤销停维、KMAC/GMAC 改拼装件、PKCS#10 改装配 x509-cert、X.509 底座 pkix-path、TPM 改 attestation 子集、RSA 增复查触发、boringtun 3 处 ring＋PR #479 监控
+- [x] **加法轮**（用户指示"继续做加法"，两线调研 15 候选）：11 项全收（COSE_Sign1/Android/Apple/MDS3/TSA/secp256k1/HPKE/AES-KW/OID/BLS/FROST），4 项暂缓（X-Wing、LMS/XMSS 契约预留；CMP/EST/SCEP 中 SCEP 排除；Kerberos 远期）；定位扩张为"OpenSSL 对标面＋现代生态超集"（GOALS §1 已记）
+- [ ] **内部分类审查**（用户指示，进行中）：L1–L7 分层与 P1–P6 期次对 26 项内容是否仍然合理（L3 膨胀、L4 边界、L6 厂商证明簇、crate 地图 20+ 项的分组合并）
 - [ ] §6 实现顺序：**最后定**（用户指示）
 - [ ] 定稿后并入 SCOPE 的时机（建议 P1 出口时）
 
@@ -170,3 +196,4 @@
 | 2026-09-16 | 创建草稿：合并生态位/合同决策/硬约束/调研缺口为内容清单——15 项交付物、算法覆盖分 P2/P3/P6、格式信任平台清单、适配器清单、阶段顺序定稿提案（PKCS#12 前置、PQC 提前）、不做清单、待拍板项。 |
 | 2026-09-16 | 45 crate 逐个核查（crates.io API）：7 项红灯复审；按"纳入证据四格"（Rust 现状/死因/跨语言参照/三判据落点）重裁：GMAC/KMAC 自构补缺、SLH-DSA deferred、Ed448/X448/pkcs1 N2 标注；裁决项定案（RSA 按操作分权、SHA-1 legacy/MD5 deferred、CLI 不做）；§6 顺序改为"最后定"（用户指示）。 |
 | 2026-09-16 | 复核调研轮（四线）修正：真缺口收窄（SP 800-90B 评估、CT 客户端层）；"算法缺失"稀缺性改为"验证级编排缺失"；SLH-DSA 有条件纳入（0.2.0-rc 活跃、0.1.0 即 FIPS 205 定稿）；SHA-1/MD5 均 deferred（rustls 栈与公共 PKI 已不需要 SHA-1）；Ed448/X448/pkcs1 撤销停维（RustCrypto 收养/活跃 RC）；KMAC/GMAC 改拼装件（cshake/sha3-kmac/ghash 基座）；PKCS#10 改装配 x509-cert；X.509 底座定 pkix-path（排除 synta 的 openssl 依赖）；TPM 改 attestation 验证子集；RSA 增复查触发（#680/#702）；boringtun 修正为 3 处 ring＋PR #479 监控；kbkdf 用 0.1.0-rc.1；上游监控清单建立。 |
+| 2026-09-16 | 加法轮（两线 15 候选四格核查）：11 项全收（COSE_Sign1 编排、Android/Play Integrity、Apple App Attest、FIDO MDS3、TSA、secp256k1、HPKE、AES-KW、OID、BLS12-381、FROST），4 项暂缓/契约预留（X-Wing 规范过期、LMS/XMSS rc 线、CMP/EST/SCEP、Kerberos）；定位扩张"OpenSSL 对标面＋现代生态超集"；crate 地图增至 22 项。 |
