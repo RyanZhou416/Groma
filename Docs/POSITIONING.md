@@ -13,7 +13,7 @@
 
 > **Groma 是纯 Rust 生态的"稀缺件 + 统一合同"双锚点库。**
 >
-> **获客锚——无 C 构建的密码学稀缺件**：当开发者需要 PKCS#12／CMS／OCSP／TPM 证明／CT／路径构建的**开箱即用、验证过的纯 Rust 能力**（复核轮证实：基础积木均已存在，但无人把它们组装成"验证级编排"——稀缺性在编排层不在算法层），需要无 C 构建的 PQC（ML-KEM/ML-DSA），或需要多协议栈共用的可替换后端时，Groma 是唯一去处。
+> **获客锚——无 C 构建的密码学稀缺件**：当开发者需要 PKCS#12／CMS／OCSP／TPM 证明／CT／路径构建的**开箱即用、验证过的纯 Rust 能力**（减法轮证实：基础积木均已存在，但无人把它们组装成"验证级编排"，更无人做差分验证——稀缺性在编排层与证据层，不在算法层），需要无 C 构建的 PQC（ML-KEM/ML-DSA），或需要多协议栈共用的可替换后端时，Groma 是**唯一被验证的去处**。
 >
 > **留存锚——统一合同**：所有稀缺件共享同一套算法族级 provider 合同（Digest/Mac/Kdf/Aead/Signer/Verifier/Kem/PasswordHash/Random）、统一类型与错误体系、能力可查询、后端可替换（RustCrypto/graviola/libcrux/ring/aws-lc-rs 均只作后端）、no_std＋alloc 首日成立。
 >
